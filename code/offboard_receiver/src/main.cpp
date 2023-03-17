@@ -81,11 +81,11 @@ void loop() {
         digitalWrite(pin1, HIGH);
       }
 
-      schalter1 = code % 2;
-      schalter2 = (code - schalter1) / 2 % 2;
-      schalter3 = (code - 2 * schalter2 - schalter1) / 4 % 2;
+      schalter1 = code % 2; //most right bit
+      schalter2 = (code - schalter1) / 2 % 2; //second most right bit
+      schalter3 = (code - 2 * schalter2 - schalter1) / 4 % 2; //third most right bit
 
-      joystick0 = (code - 4 * schalter3 - 2 * schalter2 - schalter1) / 8 % 1024;
+      joystick0 = (code - 4 * schalter3 - 2 * schalter2 - schalter1) / 8 % 1024; 
       joystick1 = (code - 8 * joystick0 - 4 * schalter3 - 2 * schalter2 - schalter1) / 8192;
 
       if (digitalRead(TAUCHZELLENSTOPP1) == 1)
