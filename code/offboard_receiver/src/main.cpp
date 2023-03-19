@@ -2,34 +2,21 @@
 
 #include <stdbool.h>
 #include <RCSwitch.h>
+#include <debug.h>
 
-#define RECEIVER_PIN 0     // entspircht pin 2 , interrupt 0
-#define PREFIX 0xfe000000  //prefix für empfang der nachricht
-#define PREFIX_MASK 0x00ffffff
+#define RECEIVER_PIN 1     // entspircht pin 2 , interrupt 0
+#define PREFIX 0xd0000000  //prefix für empfang der nachricht
+#define PREFIX_MASK 0x0fffffff
 
-#define TAUCHZELLEENA 5
-#define TAUCHZELLEIN1 6
-#define TAUCHZELLEIN2 7
-#define TAUCHZELLEIN3 8
-#define TAUCHZELLEIN4 9
-#define TAUCHZELLEENB 10
-#define TAUCHZELLENGESCHWINDIGKEIT 150
+// #define TB_MASK ((1 << 10) - 1) << 17
+#define TB_MASK    0b00000011111111100000000000000000
+#define TEMP0_MASK 0b00000000000000011111111000000000
 
-#define TAUCHZELLENSTOPP1 12
-#define TAUCHZELLENSTOPP2 13
 
-bool tauchzellenstopp1;
-bool tauchzellenstopp2;
 
-int pin = 1;
-int pin1;
 
 int baud = 9600;
-int schalter1;
-int schalter2;
-int schalter3;
-int joystick0;
-int joystick1;
+
 
 RCSwitch mySwitch = RCSwitch();
 
@@ -37,8 +24,6 @@ void setup() {
   Serial.begin(baud);
   Serial.println("Receiver setup");
   mySwitch.enableReceive(RECEIVER_PIN);
-  tauchzellenstopp1 = false;
-  tauchzellenstopp2 = false;
 }
 
 
@@ -47,74 +32,40 @@ long decode(long msg) {
   return msg & PREFIX_MASK;
 }
 
-// void prinbin(RCSwitch s){
-//   const char* b = dec2binWzerofill(s.getReceivedValue(), s.getReceivedBitlength());
-
-//    Serial.print("Bit) Binary: ");
-//    Serial.print( b );
-// }
 bool checkPrefix(unsigned long original_msg, int decoded) {
   bool passed = (decoded | PREFIX) == original_msg;
   // Serial.print("msg");
   // Serial.print(original_msg);
-
   return passed;
 }
 
-
+void debug(RCSwitch s){
+  output(mySwitch.getReceivedValue(), mySwitch.getReceivedBitlength(), mySwitch.getReceivedDelay(), mySwitch.getReceivedRawdata(),mySwitch.getReceivedProtocol());
+}
 
 
 void loop() {
   if (mySwitch.available()) {  // Wenn ein Code Empfangen wird...
-    Serial.print("msg width:");
-    Serial.println(sizeof(mySwitch.getReceivedValue()));
+    debug(mySwitch);
 
     unsigned long msg = mySwitch.getReceivedValue();
-    long code = decode(msg);
-    
+    long code = decode(msg);    
+    Serial.println((msg & TB_MASK) >> 16);
+    Serial.println((msg & TEMP0_MASK) >> 8);
+
 
     bool legit = checkPrefix(msg, code);
     if (legit) {
-      // Serial.print("Code: ");
-      // Serial.println(code);
-      if (code == 1) {
-        digitalWrite(pin1, HIGH);
-      }
+      Serial.print("Legit Code: ");
+      Serial.println(code);
 
-      schalter1 = code % 2; //most right bit
-      schalter2 = (code - schalter1) / 2 % 2; //second most right bit
-      schalter3 = (code - 2 * schalter2 - schalter1) / 4 % 2; //third most right bit
+      // schalter1 = code % 2; //most right bit
+      // schalter2 = (code - schalter1) / 2 % 2; //second most right bit
+      // schalter3 = (code - 2 * schalter2 - schalter1) / 4 % 2; //third most right bit
 
-      joystick0 = (code - 4 * schalter3 - 2 * schalter2 - schalter1) / 8 % 1024; 
-      joystick1 = (code - 8 * joystick0 - 4 * schalter3 - 2 * schalter2 - schalter1) / 8192;
+      // joystick0 = (code - 4 * schalter3 - 2 * schalter2 - schalter1) / 8 % 1024; 
+      // joystick1 = (code - 8 * joystick0 - 4 * schalter3 - 2 * schalter2 - schalter1) / 8192;
 
-      if (digitalRead(TAUCHZELLENSTOPP1) == 1)
-        tauchzellenstopp1 = true;
-      if (digitalRead(TAUCHZELLENSTOPP2) == 1)
-        tauchzellenstopp2 = true;
-
-      digitalWrite(TAUCHZELLEIN1, schalter1);
-      
-
-      if (tauchzellenstopp1)
-        digitalWrite(TAUCHZELLEIN2, schalter1);  // tauchzelle ausschalte
-      else
-        digitalWrite(TAUCHZELLEIN2, 1 - schalter1);//tauczelle an
-
-      digitalWrite(TAUCHZELLEIN3, schalter2);
-      if (tauchzellenstopp2)
-        digitalWrite(TAUCHZELLEIN4, schalter2);  //tauchzelle ausschalten
-      else
-        digitalWrite(TAUCHZELLEIN4, 1 - schalter1);
-
-      analogWrite(TAUCHZELLEENA, TAUCHZELLENGESCHWINDIGKEIT);
-      analogWrite(TAUCHZELLEENB, TAUCHZELLENGESCHWINDIGKEIT);
-
-      Serial.print(schalter1);
-      Serial.print(schalter2);
-      Serial.println(schalter3);
-      Serial.print("A0 ist");
-      Serial.println(joystick0);
     }
    else {
     Serial.print("Noise: ");

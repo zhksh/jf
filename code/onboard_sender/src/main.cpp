@@ -8,19 +8,20 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define PREFIX 0xfe000000
+#define PREFIX 0xd0000000
 #define MSG_LENGTH 32
+
+#define TB_VAL_POS 28 - 12
+#define TEMP0_POS TB_VAL_POS - 8
+#define TEMP1_POS TEMP0_POS - 8
 
 
 // PINS
-#define TRANSMITTER_PIN 10
+#define TRANSMITTER_PIN 11
 
 #define TEMPSENSOR0_PIN  4
 #define TEMPSENSOR1_PIN  5
 
-#define SWITCH3  
-#define JOYSTICK0  A0
-#define JOYSTICK1  A1
 
 #define TESENSOR A0
 
@@ -42,14 +43,14 @@ unsigned long encode(long code) {
 }
 
 
-void transmit(int code) {
+void transmit(long code) {
 
   long msg = encode(code);
-  Serial.print("code:");
+  Serial.print("raw:");
   Serial.print(code);
   Serial.print(", encoded:");
   Serial.println(msg);
-  mySwitch.send(msg, MSG_LENGTH);
+  mySwitch.send(msg , MSG_LENGTH);
 }
 
 
@@ -60,16 +61,10 @@ void setup() {
   temp1Sensor.begin();
 
   mySwitch.enableTransmit(TRANSMITTER_PIN);
-  mySwitch.setProtocol(2);
+  mySwitch.setProtocol(1);
 
  // Optional set number of transmission repetitions.
-  mySwitch.setRepeatTransmit(15);
-  
-  pinMode(2, INPUT_PULLUP);
-  pinMode(3, INPUT_PULLUP);
-  pinMode(4, INPUT_PULLUP);
-  pinMode(JOYSTICK0, INPUT);
-  pinMode(JOYSTICK1, INPUT);
+  mySwitch.setRepeatTransmit(3);
 }
 
 void printToSerial(float tb, float temp0, float temp1, float aux){
@@ -98,10 +93,31 @@ void printToSerial(float tb, float temp0, float temp1, float aux){
 
 }
 
+static char * dec2binWzerofill(unsigned long Dec, unsigned int bitLength) {
+  static char bin[64]; 
+  unsigned int i=0;
+
+  while (Dec > 0) {
+    bin[32+i++] = ((Dec & 1) > 0) ? '1' : '0';
+    Dec = Dec >> 1;
+  }
+
+  for (unsigned int j = 0; j< bitLength; j++) {
+    if (j >= bitLength - i) {
+      bin[j] = bin[ 31 + i - (j - (bitLength - i)) ];
+    } else {
+      bin[j] = '0';
+    }
+  }
+  bin[bitLength] = '\0';
+  
+  return bin;
+}
+
 float requestTemp(DallasTemperature sensor){
     float val;
     sensor.requestTemperatures(); // Send the command to get temperatures
-    Serial.println("DONE");
+    // Serial.println("DONE");
     // After we got the temperatures, we can print them here.
     // We use the function ByIndex, and as an example get the temperature from the first sensor only.
     val = sensor.getTempCByIndex(0);
@@ -124,23 +140,24 @@ void loop() {
   float tbval = analogRead(TESENSOR);
   float val0 = requestTemp(temp0Sensor);
   float val1 = requestTemp(temp1Sensor);
+  Serial.print("tbval:");
+  Serial.println(dec2binWzerofill(tbval, MSG_LENGTH));
+    Serial.print("temp0:");
+  Serial.println(dec2binWzerofill(val0, MSG_LENGTH));
+    Serial.print("temp1:");
+  Serial.println(dec2binWzerofill(val1, MSG_LENGTH));
 
-
-
-  // sensorValue/=350;
-  // sensorValue*=100;
-  // sensorValue=100-sensorValue;
   printToSerial(tbval, val0, val1, 0.0);
 
+  long raw = (long) tbval << TB_VAL_POS;
+  raw |=  (long) val0 << TEMP0_POS; 
 
-  delay(100);
-  // int schalter1 = digitalRead(SWITCH1);
-  // int schalter2 = digitalRead(SWITCH2);
-  // int schalter3 = digitalRead(SWITCH3);
-  // int joystick0 = analogRead(JOYSTICK0);
-  // int joystick1 = analogRead(JOYSTICK1);
+
+  // mySwitch.setProtocol(n%5);
+
   // // n = schalter1 + 2 * schalter2 + 4 * schalter3 + 8 * joystick0 + 8192*joystick1;
-  // transmit(n++);    
-  // delay(5);
+  transmit(raw);  
+  delay(5000);
+  
 }
 
