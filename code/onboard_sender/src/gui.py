@@ -38,6 +38,7 @@ class SubUI(QWidget):
     update_interval = 200
     port = '/dev/cu.usbmodem144401'
     baud_rate = 9600
+    datadelim = 'DATA|'
 
     sensor_names = ['tb', 'tmp0', 'tmp1', "aux"]
 
@@ -82,13 +83,20 @@ class SubUI(QWidget):
     def getSensorValues(self):
         pl = self.cnx.readline().decode()
         print(pl)
-        if (pl):
-            for s, v in self.decode_(pl): self.sensor_map[s].setText(v)
+        decoded = self.decode_(pl)
+        if (len(decoded)):
+            for s, v in decoded.items(): self.sensor_map[s].setText(v)
 
     def decode_(self, bytestr):
-        sv_pairs = bytestr.rstrip().split(";")
-        data = {tuple(pair.split(":")) for pair in sv_pairs}
-        
+        data = {}
+        if bytestr.startswith(self.datadelim):
+            bytestr = bytestr[len(self.datadelim):]
+            sv_pairs = bytestr.rstrip().split(";")
+            print(sv_pairs)
+            for pair in sv_pairs: 
+                t = tuple(pair.split(":"))            
+                data[t[0]] = t[1]
+            
         return data
 
 

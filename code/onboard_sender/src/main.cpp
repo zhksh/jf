@@ -1,6 +1,8 @@
 #include <Arduino.h>
 
 #include <RCSwitch.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -12,12 +14,9 @@
 
 // PINS
 #define TRANSMITTER_PIN 10
-#define SWITCH1  2
-#define SWITCH2  3
-#define SWITCH3  4
 
-#define TEMPSENSOR0  4
-#define TEMPSENSOR1  5
+#define TEMPSENSOR0_PIN  4
+#define TEMPSENSOR1_PIN  5
 
 #define SWITCH3  
 #define JOYSTICK0  A0
@@ -27,6 +26,13 @@
 
 
 RCSwitch mySwitch = RCSwitch();
+
+OneWire temp0Driver(TEMPSENSOR0_PIN);
+DallasTemperature temp0Sensor(&temp0Driver);
+
+OneWire temp1Driver(TEMPSENSOR1_PIN);
+DallasTemperature temp1Sensor(&temp1Driver);
+
 long n;
 
 unsigned long encode(long code) {
@@ -50,6 +56,9 @@ void transmit(int code) {
 void setup() {
   Serial.begin(9600);
   // Serial.println("Sender setup");
+  temp0Sensor.begin();
+  temp1Sensor.begin();
+
   mySwitch.enableTransmit(TRANSMITTER_PIN);
   mySwitch.setProtocol(2);
 
@@ -64,6 +73,7 @@ void setup() {
 }
 
 void printToSerial(float tb, float temp0, float temp1, float aux){
+  Serial.print("DATA|");
   Serial.print("tb");
   Serial.print(":");
   Serial.print(tb);
@@ -88,19 +98,39 @@ void printToSerial(float tb, float temp0, float temp1, float aux){
 
 }
 
+float requestTemp(DallasTemperature sensor){
+    float val;
+    sensor.requestTemperatures(); // Send the command to get temperatures
+    Serial.println("DONE");
+    // After we got the temperatures, we can print them here.
+    // We use the function ByIndex, and as an example get the temperature from the first sensor only.
+    val = sensor.getTempCByIndex(0);
+    // Check if reading was successful
+    // if(val != DEVICE_DISCONNECTED_C) 
+    // {
+    //   Serial.print("Temperature for the device 1 (index 0) is: ");
+    //   Serial.println(val);
+    // } 
+    // else
+    // {
+    //   Serial.println("Error: Could not read temperature data");
+    // }
+    return val;
+}
+
 void loop() {
 
   // float sensorValue = digitalRead(TESENSOR);
   float tbval = analogRead(TESENSOR);
-  float temp0val = digitalRead(TEMPSENSOR0);
-  float temp1val = digitalRead(TEMPSENSOR1);
+  float val0 = requestTemp(temp0Sensor);
+  float val1 = requestTemp(temp1Sensor);
 
 
 
   // sensorValue/=350;
   // sensorValue*=100;
   // sensorValue=100-sensorValue;
-  printToSerial(tbval, temp0val, temp1val, 0.0);
+  printToSerial(tbval, val0, val1, 0.0);
 
 
   delay(100);
