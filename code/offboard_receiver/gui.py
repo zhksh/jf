@@ -35,8 +35,8 @@ QPushButton, QGridLayout, QLabel, QVBoxLayout)
 from PyQt5.QtCore import QTimer
 
 class SubUI(QWidget):
-    update_interval = 200
-    port = '/dev/cu.usbmodem144401'
+    update_interval = 100
+    port = '/dev/cu.usbmodem144101'
     baud_rate = 9600
     datadelim = 'DATA|'
 

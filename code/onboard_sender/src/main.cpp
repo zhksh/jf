@@ -146,8 +146,6 @@ void loop() {
     Serial.print("temp1:");
   Serial.println(dec2binWzerofill(val1, MSG_LENGTH));
 
-  printToSerial(tbval, val0, val1, 0.0);
-
   long raw = (long) tbval << TB_VAL_POS;
   raw |=  (long) val0 << TEMP0_POS; 
   raw |=  (long) val1 << TEMP1_POS; 
@@ -155,7 +153,7 @@ void loop() {
   // mySwitch.setProtocol(n%5);
 
   transmit(raw);  
-  delay(1000);
+  delay(100);
   
 }
 

@@ -42,24 +42,45 @@ void debug(RCSwitch s){
   output(mySwitch.getReceivedValue(), mySwitch.getReceivedBitlength(), mySwitch.getReceivedDelay(), mySwitch.getReceivedRawdata(),mySwitch.getReceivedProtocol());
 }
 
+void printToSerial(float tb, float temp0, float temp1, float aux){
+  Serial.print("DATA|");
+  Serial.print("tb");
+  Serial.print(":");
+  Serial.print(tb);
+  Serial.print(";");
+
+  Serial.print("tmp0");
+  Serial.print(":");
+  Serial.print(temp0);
+  Serial.print(";");
+
+  Serial.print("tmp1");
+  Serial.print(":");
+  Serial.print(temp1);
+  Serial.print(";");
+
+  Serial.print("aux");
+  Serial.print(":");
+  Serial.print(aux);
+
+  Serial.println("");
+}
 
 void loop() {
   if (mySwitch.available()) {  // Wenn ein Code Empfangen wird...
-    debug(mySwitch);
+    // debug(mySwitch);
     unsigned long msg = mySwitch.getReceivedValue();
     long decoded = decode(msg);  
 
     bool legit = checkPrefix(msg, decoded);
     if (legit) {
-      // Serial.print("Legit Code: ");
-      // Serial.println(code);
       long tb_val =  (msg & TB_MASK) >> TB_POS;
       long temp0_val = (msg & TEMP0_MASK) >> TEMP0_POS;
       long temp1_val = (msg & TEMP1_MASK);
-
-      Serial.println(tb_val);
-      Serial.println(temp0_val);
-      Serial.println(temp1_val);
+      printToSerial(tb_val, temp0_val, temp1_val, 0.0);
+      // Serial.println(tb_val);
+      // Serial.println(temp0_val);
+      // Serial.println(temp1_val);
     }
     else {
       Serial.print("Noise: ");
