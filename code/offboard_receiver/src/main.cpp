@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <RCSwitch.h>
 
-#define RECEIVER_PIN 0     // entspircht pin 2
+#define RECEIVER_PIN 0     // entspircht pin 2 , interrupt 0
 #define PREFIX 0xfe000000  //prefix für empfang der nachricht
 #define PREFIX_MASK 0x00ffffff
 
@@ -66,12 +66,12 @@ bool checkPrefix(unsigned long original_msg, int decoded) {
 
 void loop() {
   if (mySwitch.available()) {  // Wenn ein Code Empfangen wird...
-
+    Serial.print("msg width:");
+    Serial.println(sizeof(mySwitch.getReceivedValue()));
 
     unsigned long msg = mySwitch.getReceivedValue();
     long code = decode(msg);
-    // Serial.print("msg width:");
-    // Serial.println(sizeof(code));
+    
 
     bool legit = checkPrefix(msg, code);
     if (legit) {
