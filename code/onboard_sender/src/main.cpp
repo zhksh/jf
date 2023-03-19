@@ -11,9 +11,10 @@
 #define PREFIX 0xd0000000
 #define MSG_LENGTH 32
 
-#define TB_VAL_POS 28 - 12
-#define TEMP0_POS TB_VAL_POS - 8
-#define TEMP1_POS TEMP0_POS - 8
+#define TEMP0_POS 0
+#define TEMP1_POS 8
+#define TB_VAL_POS 16
+
 
 
 // PINS
@@ -89,8 +90,6 @@ void printToSerial(float tb, float temp0, float temp1, float aux){
   Serial.print(aux);
 
   Serial.println("");
-
-
 }
 
 static char * dec2binWzerofill(unsigned long Dec, unsigned int bitLength) {
@@ -151,13 +150,12 @@ void loop() {
 
   long raw = (long) tbval << TB_VAL_POS;
   raw |=  (long) val0 << TEMP0_POS; 
-
+  raw |=  (long) val1 << TEMP1_POS; 
 
   // mySwitch.setProtocol(n%5);
 
-  // // n = schalter1 + 2 * schalter2 + 4 * schalter3 + 8 * joystick0 + 8192*joystick1;
   transmit(raw);  
-  delay(5000);
+  delay(1000);
   
 }
 
