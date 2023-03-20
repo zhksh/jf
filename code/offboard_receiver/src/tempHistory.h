@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-class TempHIst {
+class TempHistory {
   int length = 10;
 
   float stack[10] = {};

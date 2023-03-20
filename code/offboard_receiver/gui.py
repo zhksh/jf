@@ -1,55 +1,29 @@
 import serial
 import time
-import tkinter
 import sys
 
-
-def quit():
-    global tkTop
-    ser.write(bytes('L', 'UTF-8'))
-    tkTop.destroy()
-
-def set_button1_state():
-        global b
-        b += 1
-        varLabel.set("LED ON ")
-        ser.write(bytes('H', 'UTF-8'))
-        varLabel2.set(b)
-        print(b)
-
-def set_button2_state():
-        varLabel.set("LED OFF")
-        ser.write(bytes('L', 'UTF-8'))
-
-# tcl = tkinter.Tcl()
-# print(tcl.call("info", "patchlevel"))
-#exit()
-# ser = serial.Serial('/dev/cu.usbmodem144401', 9600)
-# print("Reset Arduino")
-# time.sleep(3)
-# ser.write(bytes('L', 'UTF-8'))
-import sys
 from PyQt5.QtWidgets import (QApplication, QWidget,
 QPushButton, QGridLayout, QLabel, QVBoxLayout)
-
 from PyQt5.QtCore import QTimer
 
+
 class SubUI(QWidget):
+
     update_interval = 300
-    port = '/dev/ttyACM1'
+    port = '/dev/cu.usbmodem141101'
     baud_rate = 9600
     datadelim = 'DATA|'
-
     sensor_names = ['tb', 'tmp0', 'tmp1', "aux"]
 
     def __init__(self):
         super().__init__()
         self.initUI()
 
+
     def connect(self):
-        print("Connect to Arduino")
+        print("Connecting to Arduino on {}".format(self.port))
         self.cnx = serial.Serial(self.port, self.baud_rate)
-        time.sleep(3)
+        time.sleep(2)
 
 
     def setup_loop(self):
@@ -71,8 +45,7 @@ class SubUI(QWidget):
         font_val = self.font()
         font_val.setPointSize(70)
         font_label = self.font()
-        font_label.setPointSize(40)
-       
+        font_label.setPointSize(40)      
 
         positions = [(i, j) for i in range(2) for j in range(2)]
         for position, name in zip(positions, self.sensor_names):
@@ -100,12 +73,12 @@ class SubUI(QWidget):
         if (len(decoded)):
             for s, v in decoded.items(): self.sensor_map[s].setText(v)
 
+
     def decode_(self, bytestr):
         data = {}
         if bytestr.startswith(self.datadelim):
-            bytestr = bytestr[len(self.datadelim):]
-            sv_pairs = bytestr.rstrip().split(";")
-            print(sv_pairs)
+            sv_pairs = bytestr[len(self.datadelim):].rstrip().split(";")
+            # print(sv_pairs)
             for pair in sv_pairs: 
                 t = tuple(pair.split(":"))            
                 data[t[0]] = t[1]
@@ -113,11 +86,8 @@ class SubUI(QWidget):
         return data
 
 
-    def setVal(self, name, val):
-        self.map[name].setText(val)
-
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     subUI = SubUI()
     sys.exit(app.exec_())
-    self.ser.close()
+    subUI.cnx.close()
