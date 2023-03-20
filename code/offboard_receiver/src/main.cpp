@@ -82,7 +82,7 @@ float convertTransToTemp(long transmitted){
   float temp = (float) transmitted/10;
   //we assume if tempt drops by more than 20C cmp to avg and last value its an overflow
   //and add the cutoff value, which should be precisely 256/10
-  if ((temp + 20) < hist.getAvg() &  hist.getLast() - temp  > 20 ){
+  if ((temp + 20) < hist.getAvg() &  hist.getLast() - temp  > 20){
     temp += 25.6;
   } 
   hist.push(temp);
