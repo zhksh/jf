@@ -72,7 +72,6 @@ class SubUI(QWidget):
         font_val.setPointSize(70)
         font_label = self.font()
         font_label.setPointSize(40)
-        # set the font for the widget:
        
 
         positions = [(i, j) for i in range(2) for j in range(2)]

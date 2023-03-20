@@ -139,21 +139,28 @@ void loop() {
   float tbval = analogRead(TESENSOR);
   float val0 = requestTemp(temp0Sensor);
   float val1 = requestTemp(temp1Sensor);
+  long val0_cut = val0 *10;
+  long val1_cut = val1 *10;
+
   Serial.print("tbval:");
   Serial.println(dec2binWzerofill(tbval, MSG_LENGTH));
-    Serial.print("temp0:");
-  Serial.println(dec2binWzerofill(val0, MSG_LENGTH));
-    Serial.print("temp1:");
-  Serial.println(dec2binWzerofill(val1, MSG_LENGTH));
+  Serial.print("temp0:");
+  Serial.println(val0_cut);
+  Serial.println(val0);
+  Serial.println(dec2binWzerofill(val0_cut, MSG_LENGTH));
+  Serial.print("temp1:");
+  Serial.println(val1_cut);
+  Serial.println(val1);
+  Serial.println(dec2binWzerofill(val1_cut, MSG_LENGTH));
 
   long raw = (long) tbval << TB_VAL_POS;
-  raw |=  (long) val0 << TEMP0_POS; 
-  raw |=  (long) val1 << TEMP1_POS; 
+  raw |=  val1_cut << TEMP1_POS; 
+  raw |=  val0_cut << TEMP0_POS; 
 
   // mySwitch.setProtocol(n%5);
 
   transmit(raw);  
-  delay(100);
+  delay(2000);
   
 }
 

@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <tempHistory.h>
 
 #include <stdbool.h>
 #include <RCSwitch.h>
@@ -14,15 +15,20 @@
 #define TB_MASK    0x0fff0000
 #define TB_POS     16
 
-#define TEMP0_MASK 0x0000ff00
-#define TEMP0_POS  8
 
-#define TEMP1_MASK 0x000000ff
-#define TEMP1_POS  0
+
+#define TEMP0_MASK 0x000000ff
+#define TEMP0_POS  0
+
+
+#define TEMP1_MASK 0x0000ff00
+#define TEMP1_POS  8
 
 #define BAUD  9600
 
+
 RCSwitch mySwitch = RCSwitch();
+TempHIst hist = TempHIst();
 
 void setup() {
   Serial.begin(BAUD);
@@ -69,6 +75,17 @@ void printToSerial(float tb, float temp0, float temp1, float aux){
   Serial.println("");
 }
 
+float convertTransToTemp(long transmitted){
+  float temp = (float) transmitted/10;
+  //we assume if tempt drops by more than 10deg cmp to avg its an overflow
+  if ((temp + 10) < hist.getAvg()){
+    temp += 25.6;
+  } 
+  hist.push(temp);
+
+  return temp;
+}
+
 void loop() {
   if (mySwitch.available()) {  // Wenn ein Code Empfangen wird...
     // debug(mySwitch);
@@ -79,10 +96,21 @@ void loop() {
     if (legit) {
       long tb_val =  (msg & TB_MASK) >> TB_POS;
       long temp0_val = (msg & TEMP0_MASK) >> TEMP0_POS;
-      long temp1_val = (msg & TEMP1_MASK);
-      printToSerial(tb_val, temp0_val, temp1_val, 0.0);
+      long temp1_val = (msg & TEMP1_MASK) >> TEMP1_POS;
+      float temp0 = convertTransToTemp(temp0_val);
+      float temp1 = convertTransToTemp(temp1_val);
+      Serial.println("##############");
+      Serial.println(temp0);
+      Serial.println(temp1);
+
+
+
+      float temp1_dec = (float) temp1_val/10;
+      // printToSerial(tb_val, temp0_dec , temp1_dec, 0.0);
       // Serial.println(tb_val);
+      // Serial.println(temp0_dec);
       // Serial.println(temp0_val);
+      //   Serial.println(temp1_dec);
       // Serial.println(temp1_val);
     }
     else {
