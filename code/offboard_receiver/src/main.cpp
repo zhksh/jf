@@ -6,7 +6,6 @@
 #include <debug.h>
 
 
-
 #define RECEIVER_PIN 0     //interrupt 0 == pin 2
 
 #define PREFIX 0xd0000000  //codeword prefix 
@@ -78,8 +77,8 @@ void encodeForUI(float tb, float temp0, float temp1, float aux){
 
 
 float convertTransToTemp(long transmitted){
-  //we want to make a byte a float with one decimal and therefore need transmitted < 100
-  if (transmitted >= 100) return (float) transmitted;
+  //we want to make a byte a float with one decimal and therefore need transmitted < 1000
+  if (transmitted >= 1000) return (float) transmitted;
   float temp = (float) transmitted/10;
   //we assume if tempt drops by more than 20C cmp to avg and last value its an overflow
   //and add the cutoff value, which should be precisely 256/10
@@ -90,6 +89,7 @@ float convertTransToTemp(long transmitted){
 
   return temp;
 }
+
 
 void loop() {
   if (receiver.available()) {
