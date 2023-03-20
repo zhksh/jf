@@ -99,26 +99,16 @@ void loop() {
       long temp1_val = (msg & TEMP1_MASK) >> TEMP1_POS;
       float temp0 = convertTransToTemp(temp0_val);
       float temp1 = convertTransToTemp(temp1_val);
-      Serial.println("##############");
-      Serial.println(temp0);
-      Serial.println(temp1);
-
-
-
-      float temp1_dec = (float) temp1_val/10;
-      // printToSerial(tb_val, temp0_dec , temp1_dec, 0.0);
-      // Serial.println(tb_val);
-      // Serial.println(temp0_dec);
-      // Serial.println(temp0_val);
-      //   Serial.println(temp1_dec);
-      // Serial.println(temp1_val);
+      // Serial.println("##############");
+      // Serial.println(temp0);
+      // Serial.println(temp1);
+      printToSerial(tb_val, temp0, temp1, 0.0);
     }
     else {
       Serial.print("Noise: ");
       debug(mySwitch);
     }
-
-
+    
     mySwitch.resetAvailable();
   }
 }
