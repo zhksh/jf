@@ -4,7 +4,10 @@
 #include <RCSwitch.h>
 #include <debug.h>
 
+
+
 #define RECEIVER_PIN 1     // entspircht pin 2 , interrupt 0
+
 #define PREFIX 0xd0000000  //prefix für empfang der nachricht
 #define PREFIX_MASK 0x0fffffff
 
@@ -84,7 +87,7 @@ void loop() {
     }
     else {
       Serial.print("Noise: ");
-      // Serial.println(code);
+      debug(mySwitch);
     }
 
 

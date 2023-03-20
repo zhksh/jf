@@ -35,8 +35,8 @@ QPushButton, QGridLayout, QLabel, QVBoxLayout)
 from PyQt5.QtCore import QTimer
 
 class SubUI(QWidget):
-    update_interval = 100
-    port = '/dev/cu.usbmodem144101'
+    update_interval = 300
+    port = '/dev/ttyACM1'
     baud_rate = 9600
     datadelim = 'DATA|'
 
@@ -60,16 +60,30 @@ class SubUI(QWidget):
 
 
     def initUI(self):   
-        grid = QGridLayout()  
+        grid = QGridLayout()
+        # grid.setRowStretch(0, 2) 
+        grid.setColumnStretch(0,2) 
         self.setLayout(grid)
         self.connect()
         self.sensor_map = {}
 
+        self.setFixedSize(640, 480)
+        font_val = self.font()
+        font_val.setPointSize(70)
+        font_label = self.font()
+        font_label.setPointSize(40)
+        # set the font for the widget:
+       
+
         positions = [(i, j) for i in range(2) for j in range(2)]
         for position, name in zip(positions, self.sensor_names):
             val = QLabel("0")
+            label = QLabel(name)
             layout = QVBoxLayout()
-            layout.addWidget(QLabel(name))
+            val.setFont(font_val)
+            label.setFont(font_label)
+            label.setStyleSheet("border-bottom: 1px solid black;")
+            layout.addWidget(label)
             layout.addWidget(val)
             grid.addLayout(layout, *position)
             self.sensor_map[name] = val
