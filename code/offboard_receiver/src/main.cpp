@@ -78,9 +78,11 @@ void encodeForUI(float tb, float temp0, float temp1, float aux){
 
 
 float convertTransToTemp(long transmitted){
+  //we want to make a byte a float with one decimal and therefore need transmitted < 100
+  if (transmitted >= 100) return (float) transmitted;
   float temp = (float) transmitted/10;
-  //we assume if tempt drops by more than 10deg cmp to avg its an overflow
-  //that way we can infer values > 256 (8bit)
+  //we assume if tempt drops by more than 20C cmp to avg and last value its an overflow
+  //and add the cutoff value, which should be precisely 256/10
   if ((temp + 20) < hist.getAvg() &  hist.getLast() - temp  > 20 ){
     temp += 25.6;
   } 
