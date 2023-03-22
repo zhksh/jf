@@ -10,7 +10,11 @@ from PyQt5.QtCore import QTimer
 class SubUI(QWidget):
 
     update_interval = 300
+<<<<<<< HEAD
     port = '/dev/ttyACM0'
+=======
+    port = '/dev/cu.usbmodem144401'
+>>>>>>> 6ef4c716d4395429d4c5aed70db24c1784211974
     baud_rate = 9600
     datadelim = 'DATA|'
     sensor_names = ['tb', 'tmp0', 'tmp1', "aux"]
