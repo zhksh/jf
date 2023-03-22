@@ -42,7 +42,7 @@ bool checkPrefix(unsigned long original_msg, long  decoded) {
   return passed;
 }
 
-void debug(RCSwitch s){
+void debug(RCSwitch reciever){
   output(receiver.getReceivedValue(), receiver.getReceivedBitlength(), receiver.getReceivedDelay(), receiver.getReceivedRawdata(),receiver.getReceivedProtocol());
 }
 
