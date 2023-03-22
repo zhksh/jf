@@ -161,6 +161,50 @@ void loop() {
       Serial.println(joystick_data);
       // showJConfig(joystick_data);
       // debug(mySwitch);
+        //Auslesen der Tauchzellensensoren:
+
+  if (digitalRead(TAUCHZELLENSTOPP1) == 1)
+    tauchzellenstopp1 = true;
+  if (digitalRead(TAUCHZELLENSTOPP2) == 1)
+    tauchzellenstopp2 = true;
+
+  /*statt dem schalter1, der normalerweise vom Sender empfangen wird, wird jetzt der Testpin
+    verwendet. Ist der Testpin an, soll die Tauchzelle anfahren.*/
+  schalter1 = digitalRead(TESTPIN);
+
+  if (schalter1 = HIGH) {
+    digitalWrite(TAUCHZELLEIN1, HIGH);
+    if (tauchzellenstopp1)
+      digitalWrite(TAUCHZELLEIN2, HIGH);  // tauchzelle ausschalten
+    tauchzelleausgefahren = true;   //tauchzelle wird als ausgefahren gemeldet
+  }
+
+  else
+    digitalWrite(TAUCHZELLEIN2, LOW);  //tauczelle anschalten
+
+  if (schalter1 = LOW) {
+
+    if (tauchzelleausgefahren)
+    { digitalWrite(TAUCHZELLEIN1, LOW);
+      digitalWrite(TAUCHZELLEIN2, HIGH);
+
+    }
+
+
+
+
+    /*Zweite Tauchzelle wird noch nicht getestet:
+
+      digitalWrite(TAUCHZELLEIN3, schalter2);
+      if (tauchzellenstopp2)
+      digitalWrite(TAUCHZELLEIN4, schalter2);  //tauchzelle ausschalten
+      else
+      digitalWrite(TAUCHZELLEIN4, 1 - schalter1);
+
+    */
+
+    analogWrite(TAUCHZELLEENA, TAUCHZELLENGESCHWINDIGKEIT);
+    analogWrite(TAUCHZELLEENB, TAUCHZELLENGESCHWINDIGKEIT);
     }
    else {
       Serial.print("Noise: ");
