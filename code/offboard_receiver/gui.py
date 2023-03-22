@@ -91,13 +91,11 @@ class SubUI(QWidget):
 
 
 if __name__ == '__main__':
-
     if len(sys.argv) < 2:
-        port = '/dev/ttyACM0'
+        path = '/dev/ttyACM0'
     else:
-        port = sys.argv[1] 
-    
+        path = sys.argv[1]
     app = QApplication(sys.argv)
-    subUI = SubUI(port)
+    subUI = SubUI(path)
     sys.exit(app.exec_())
     subUI.cnx.close()
