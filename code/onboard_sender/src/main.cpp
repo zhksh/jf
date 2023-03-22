@@ -160,7 +160,7 @@ void loop() {
   // mySwitch.setProtocol(n%5);
 
   transmit(raw);  
-  delay(2000);
+  delay(200);
   
 }
 

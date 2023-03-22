@@ -9,25 +9,25 @@ from PyQt5.QtCore import QTimer
 
 class SubUI(QWidget):
 
-    update_interval = 300
-<<<<<<< HEAD
-    port = '/dev/ttyACM0'
-=======
-    port = '/dev/cu.usbmodem144401'
->>>>>>> 6ef4c716d4395429d4c5aed70db24c1784211974
+    update_interval = 300    
     baud_rate = 9600
     datadelim = 'DATA|'
     sensor_names = ['tb', 'tmp0', 'tmp1', "aux"]
 
-    def __init__(self):
+    def __init__(self, port):
         super().__init__()
+        self.port = port
         self.initUI()
 
 
     def connect(self):
         print("Connecting to Arduino on {}".format(self.port))
-        self.cnx = serial.Serial(self.port, self.baud_rate)
-        time.sleep(2)
+        try:        
+            self.cnx = serial.Serial(self.port, self.baud_rate)
+            time.sleep(2)
+        except Exception as e:
+            print("that didnt work:" + str(e))
+            exit(1)
 
 
     def setup_loop(self):
@@ -91,7 +91,13 @@ class SubUI(QWidget):
 
 
 if __name__ == '__main__':
+
+    if len(sys.argv) < 2:
+        port = '/dev/ttyACM0'
+    else:
+        port = sys.argv[1] 
+    
     app = QApplication(sys.argv)
-    subUI = SubUI()
+    subUI = SubUI(port)
     sys.exit(app.exec_())
     subUI.cnx.close()
