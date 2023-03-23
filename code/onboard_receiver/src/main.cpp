@@ -21,8 +21,6 @@
 #define TAUCHZELLEENB 10
 #define TAUCHZELLENSTOP2 11
 
-
-
 #define TAUCHZELLENGESCHWINDIGKEIT 150
 
 #define CHECK_BIT(var,pos) ((var) & (1<<(pos))) != 0
@@ -34,7 +32,7 @@ bool tauchzellenstopp2 = false;
 bool tauchzelle1ausgefahren = false;
 bool tauchzelle2ausgefahren = false;
 
-int EINFAHRZEIT = 5000;
+int EINFAHRZEIT = 15000;
 
 long EINFAHRTTS1 = 0;
 long EINFAHRTTS2 = 0;
