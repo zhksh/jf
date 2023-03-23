@@ -198,7 +198,7 @@ void loop() {
           //einfahren
           Serial.print(" TZ2:einfahren");
           turnTZ2r();
-          if (millis() - EINFAHRTTS1 > EINFAHRZEIT){
+          if (millis() - EINFAHRTTS2 > EINFAHRZEIT){
             //genug eingefahren, stop
             Serial.print(" TZ2:eingefahren stop");
             stopTZ2();
