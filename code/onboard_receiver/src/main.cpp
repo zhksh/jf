@@ -160,7 +160,7 @@ void loop() {
   Serial.print("S1:");
   Serial.print(schalter1);
   //Auslesen der Tauchzellensensoren:
-  if (digitalRead(TAUCHZELLENSTOP1) == 1){
+  if (digitalRead(TAUCHZELLENSTOP1) == 0){
     tauchzellenstopp1 = true;
     tauchzelle1ausgefahren = true;
     Serial.print(" Endsensor1:stop");
