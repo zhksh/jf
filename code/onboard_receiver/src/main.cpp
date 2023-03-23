@@ -15,7 +15,7 @@
 #define TAUCHZELLENGESCHWINDIGKEIT 150
 
 #define TAUCHZELLENSTOPP1 12
-#define TAUCHZELLENSTOPP2 13
+#define TAUCHZELLENSTOPP2 11
 
 #define TESTPIN 2
 
@@ -23,11 +23,15 @@
 #define CHECK_BIT(var,pos) ((var) & (1<<(pos))) != 0
 
 
-bool tauchzellenstopp1;
-bool tauchzellenstopp2;
+bool tauchzellenstopp1 = false;
+bool tauchzellenstopp2 = false;
 
-bool tauchzelleausgefahren;
+bool tauchzelle1ausgefahren = false;
+bool tauchzelle2ausgefahren = false;
+
 int EINFAHRZEIT = 10000;
+
+int EINFAHRT1 = 0
 
 int pin = 1;
 int pin1;
@@ -46,10 +50,6 @@ void setup() {
   Serial.begin(baud);
   Serial.println("Receiver setup");
   mySwitch.enableReceive(RECEIVER_PIN);
-  tauchzellenstopp1 = false;
-  tauchzellenstopp2 = false;
-  tauchzelleausgefahren = false;
-
 }
 
 
@@ -140,32 +140,45 @@ void loop() {
 
   //Auslesen der Tauchzellensensoren:
 
-  if (digitalRead(TAUCHZELLENSTOPP1) == 1)
+  if (digitalRead(TAUCHZELLENSTOPP1) == 1){
     tauchzellenstopp1 = true;
-  if (digitalRead(TAUCHZELLENSTOPP2) == 1)
-    tauchzellenstopp2 = true;
+    tauchzelle1ausgefahren = true;
+  }
+  else {
+    tauchzellenstopp1 = false;
+  }
 
   /*statt dem schalter1, der normalerweise vom Sender empfangen wird, wird jetzt der Testpin
     verwendet. Ist der Testpin an, soll die Tauchzelle anfahren.*/
-  schalter1 = digitalRead(TESTPIN);
+  // schalter1 = digitalRead(TESTPIN);
 
-  if (schalter1 = HIGH) {
-    digitalWrite(TAUCHZELLEIN1, HIGH);
-    if (tauchzellenstopp1)
-      digitalWrite(TAUCHZELLEIN2, HIGH);  // tauchzelle ausschalten
-    tauchzelleausgefahren = true;   //tauchzelle wird als ausgefahren gemeldet
+  if (schalter1) {
+    if (tauchzelle1ausgefahren || tauchzellenstopp1) {
+      digitalWrite(TAUCHZELLEIN1, LOW);
+    }
+    else {
+      digitalWrite(TAUCHZELLEIN1, HIGH);
+    }
+    if (tauchzellenstopp1){
+      digitalWrite(TAUCHZELLEIN1, LOW);  // tauchzelle ausschalten
+      tauchzelle1ausgefahren = true;   //tauchzelle wird als ausgefahren gemeldet
+    }     
+  }
+  else{
+    digitalWrite(TAUCHZELLEIN1, LOW);  
   }
 
-  else
-    digitalWrite(TAUCHZELLEIN2, LOW);  //tauczelle anschalten
-
-  if (schalter1 = LOW) {
-
-    if (tauchzelleausgefahren)
-    { digitalWrite(TAUCHZELLEIN1, LOW);
-      digitalWrite(TAUCHZELLEIN2, HIGH);
-
+  if (!schalter1) {
+    if (tauchzelle1ausgefahren){
+      digitalWrite(TAUCHZELLEIN1, LOW);
+      EINFAHRT1++;
+      // digitalWrite(TAUCHZELLEIN2, HIGH);
     }
+    if (EINFAHRT1 >= EINFAHRZEIT){
+      tauchzelle1ausgefahren = false;
+      EINFAHRT1 = 0;
+    }
+  }
 
 
 
