@@ -7,8 +7,9 @@
 #define PREFIX_MASK 0x00ffffff
 
 #define TAUCHZELLEENA 5
-#define TAUCHZELLEIN1 6
-#define TAUCHZELLEIN2 7
+#define TAUCHZELLE10 6
+#define TAUCHZELLE11 7
+
 #define TAUCHZELLEIN3 8
 #define TAUCHZELLEIN4 9
 #define TAUCHZELLEENB 10
@@ -120,6 +121,22 @@ void showJConfig(int data){
     // Serial.println("");
 }
 
+
+void turnTZ1r(){
+    digitalWrite(TAUCHZELLE10, LOW);
+    digitalWrite(TAUCHZELLE11, HIGH);
+}
+
+void turnTZ1l(){
+    digitalWrite(TAUCHZELLE10, HIGH);
+    digitalWrite(TAUCHZELLE11, LOW);
+}
+
+void stopTZ1(){
+   digitalWrite(TAUCHZELLE10, LOW);
+   digitalWrite(TAUCHZELLE11, LOW);
+}
+
 void loop() {
   if (mySwitch.available()) {  // Wenn ein Code Empfangen wird...
     unsigned long code = mySwitch.getReceivedValue();
@@ -153,32 +170,29 @@ void loop() {
   // schalter1 = digitalRead(TESTPIN);
 
   if (schalter1) {
-    if (tauchzelle1ausgefahren || tauchzellenstopp1) {
-      digitalWrite(TAUCHZELLEIN1, LOW);
+    if (tauchzellenstopp1) {
+      stopTZ1();
     }
+    //ausfahren
     else {
-      digitalWrite(TAUCHZELLEIN1, HIGH);
+      turnTZ1l();
     }
-    if (tauchzellenstopp1){
-      digitalWrite(TAUCHZELLEIN1, LOW);  // tauchzelle ausschalten
-      tauchzelle1ausgefahren = true;   //tauchzelle wird als ausgefahren gemeldet
-    }     
   }
-  else{
-    digitalWrite(TAUCHZELLEIN1, LOW);  
+  //schalter aus
+  else {
+    if (tauchzelle1ausgefahren){
+      //einfahren
+      turnTZ1r();
+      EINFAHRT1++;
+      if (EINFAHRT >= EINFAHRZEIT){
+        stopTZ1();
+        EINFAHRT = 0;
+        tauchzelle1ausgefahren = false;  
+      }
+    }
   }
 
-  if (!schalter1) {
-    if (tauchzelle1ausgefahren){
-      digitalWrite(TAUCHZELLEIN1, LOW);
-      EINFAHRT1++;
-      // digitalWrite(TAUCHZELLEIN2, HIGH);
-    }
-    if (EINFAHRT1 >= EINFAHRZEIT){
-      tauchzelle1ausgefahren = false;
-      EINFAHRT1 = 0;
-    }
-  }
+
 
 
 
