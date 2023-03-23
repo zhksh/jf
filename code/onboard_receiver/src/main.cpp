@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <RCSwitch.h>
-#include <debug.h>
+// #include <debug.h>
+#include <util.h>
 
 #define RECEIVER_PIN 0     // entspircht pin 2
 #define PREFIX 0xff000000  //prefix für empfang der nachricht
@@ -57,7 +58,6 @@ void setup() {
   mySwitch.enableReceive(RECEIVER_PIN);
 }
 
-
 long decode(long msg) {
   return msg & PREFIX_MASK;
 }
@@ -68,75 +68,6 @@ bool checkPrefix(unsigned long original_msg, long  decoded) {
   // Serial.print(original_msg);
   return passed;
 }
-
-void debug(RCSwitch receiver){
-  output(receiver.getReceivedValue(), receiver.getReceivedBitlength(), receiver.getReceivedDelay(), receiver.getReceivedRawdata(),receiver.getReceivedProtocol());
-}
-
-long bitrange(long msg, int len, int pos){
-  long mask = (1 << len)-1;
-  // Serial.println(mask);
-  long result = msg >> pos;
-  return result & mask;
-}
-
-struct JData {
-  bool left;
-  bool right;
-  bool none;
-};
-
-struct JoystickControlData {
-  JData j1;
-  JData j2;
-};
-
-void showJConfig(int data){
-  String r = "rechts";
-  String l = "links";
-  String h = "hoch";
-  String ru = "runter";
-  String n = "neutral";
-  Serial.print("J0 ");
-  Serial.print("x: ");
-  if ((data & 0b01000000) >> 6){
-    Serial.print(n); 
-    // data -> j1 -> right = (data & 0b01000000) >> 6;
-  } 
-  else {
-      if ((data & 0b10000000)) Serial.print(r);
-      else Serial.print(l);
-
-  }
-  Serial.print(" y: ");
-  if ((data & 0b00010000) >> 4) Serial.print(n);
-  else {
-    if ((data & 0b00100000)) Serial.print(h);
-    else Serial.print(ru);
-  }
-  
-  Serial.println("");
-  Serial.print("J1:");
-  Serial.print(" x: ");
-  if ((data & 0b00000100) >> 2) Serial.print(n);
-  else {
-      if ((data & 0b00001000)) Serial.print(r);
-      else Serial.print(l);
-
-  }
-  Serial.print(" y: ");
-  if ((data & 0b00000001)) Serial.print(n);
-  else {
-    if ((data & 0b00000010)) Serial.print(h);
-    else Serial.print(ru);
-
-  }
-      Serial.println("");
-    // Serial.print("data:");
-    // Serial.print(data);
-    // Serial.println("");
-}
-
 
 void turnTZ1r(){
     digitalWrite(TAUCHZELLE10, LOW);

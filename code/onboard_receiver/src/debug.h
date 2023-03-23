@@ -62,3 +62,49 @@ static char * dec2binWzerofill(unsigned long Dec, unsigned int bitLength) {
   
   return bin;
 }
+
+void showJConfig(int data){
+  String r = "rechts";
+  String l = "links";
+  String h = "hoch";
+  String ru = "runter";
+  String n = "neutral";
+  Serial.print("J0 ");
+  Serial.print("x: ");
+  if ((data & 0b01000000) >> 6){
+    Serial.print(n); 
+    // data -> j1 -> right = (data & 0b01000000) >> 6;
+  } 
+  else {
+      if ((data & 0b10000000)) Serial.print(r);
+      else Serial.print(l);
+
+  }
+  Serial.print(" y: ");
+  if ((data & 0b00010000) >> 4) Serial.print(n);
+  else {
+    if ((data & 0b00100000)) Serial.print(h);
+    else Serial.print(ru);
+  }
+  
+  Serial.println("");
+  Serial.print("J1:");
+  Serial.print(" x: ");
+  if ((data & 0b00000100) >> 2) Serial.print(n);
+  else {
+      if ((data & 0b00001000)) Serial.print(r);
+      else Serial.print(l);
+
+  }
+  Serial.print(" y: ");
+  if ((data & 0b00000001)) Serial.print(n);
+  else {
+    if ((data & 0b00000010)) Serial.print(h);
+    else Serial.print(ru);
+
+  }
+      Serial.println("");
+    // Serial.print("data:");
+    // Serial.print(data);
+    // Serial.println("");
+}
