@@ -30,7 +30,7 @@ bool tauchzellenstopp2 = false;
 bool tauchzelle1ausgefahren = false;
 bool tauchzelle2ausgefahren = false;
 
-int EINFAHRZEIT = 10000;
+int EINFAHRZEIT = 5000;
 
 int EINFAHRT1 = 0;
 
@@ -52,7 +52,6 @@ void setup() {
   Serial.println("Receiver setup");
   mySwitch.enableReceive(RECEIVER_PIN);
 }
-
 
 long decode(long msg) {
   return msg & PREFIX_MASK;
