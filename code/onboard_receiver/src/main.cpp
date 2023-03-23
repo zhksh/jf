@@ -6,20 +6,21 @@
 #define PREFIX 0xff000000  //prefix für empfang der nachricht
 #define PREFIX_MASK 0x00ffffff
 
+
+// Tauchzelle 1
 #define TAUCHZELLEENA 5
 #define TAUCHZELLE10 6
 #define TAUCHZELLE11 7
+#define TAUCHZELLENSTOP1 12
 
+
+// Tauchzelle 2
 #define TAUCHZELLEIN3 8
 #define TAUCHZELLEIN4 9
 #define TAUCHZELLEENB 10
-#define TAUCHZELLENGESCHWINDIGKEIT 150
-
 #define TAUCHZELLENSTOP2 11
-#define TAUCHZELLENSTOP1 12
 
-#define TESTPIN 2
-
+#define TAUCHZELLENGESCHWINDIGKEIT 150
 
 #define CHECK_BIT(var,pos) ((var) & (1<<(pos))) != 0
 
@@ -30,9 +31,10 @@ bool tauchzellenstopp2 = false;
 bool tauchzelle1ausgefahren = false;
 bool tauchzelle2ausgefahren = false;
 
-int EINFAHRZEIT = 10000;
+int EINFAHRZEIT = 5000;
 
 long EINFAHRTTS1 = 0;
+long EINFAHRTTS2 = 0;
 
 int pin = 1;
 int pin1;
@@ -48,6 +50,8 @@ RCSwitch mySwitch = RCSwitch();
 
 void setup() {
   pinMode(TAUCHZELLENSTOP1, INPUT_PULLUP);
+  pinMode(TAUCHZELLENSTOP2, INPUT_PULLUP);
+
   Serial.begin(baud);
   Serial.println("Receiver setup");
   mySwitch.enableReceive(RECEIVER_PIN);
@@ -76,6 +80,16 @@ long bitrange(long msg, int len, int pos){
   return result & mask;
 }
 
+struct JData {
+  bool left;
+  bool right;
+  bool none;
+};
+
+struct JoystickControlData {
+  JData j1;
+  JData j2;
+};
 
 void showJConfig(int data){
   String r = "rechts";
@@ -83,10 +97,12 @@ void showJConfig(int data){
   String h = "hoch";
   String ru = "runter";
   String n = "neutral";
-
   Serial.print("J0 ");
   Serial.print("x: ");
-  if ((data & 0b01000000) >> 6) Serial.print(n);
+  if ((data & 0b01000000) >> 6){
+    Serial.print(n); 
+    // data -> j1 -> right = (data & 0b01000000) >> 6;
+  } 
   else {
       if ((data & 0b10000000)) Serial.print(r);
       else Serial.print(l);
@@ -137,6 +153,23 @@ void stopTZ1(){
    digitalWrite(TAUCHZELLE11, LOW);
 }
 
+// Tauchzelle 2
+void turnTZ2r(){
+    digitalWrite(TAUCHZELLEIN3, LOW);
+    digitalWrite(TAUCHZELLEIN4, HIGH);
+}
+
+void turnTZ2l(){
+    digitalWrite(TAUCHZELLEIN3, HIGH);
+    digitalWrite(TAUCHZELLEIN4, LOW);
+}
+
+void stopTZ2(){
+   digitalWrite(TAUCHZELLEIN3, LOW);
+   digitalWrite(TAUCHZELLEIN4, LOW);
+}
+
+
 void loop() {
   if (mySwitch.available()) {  // Wenn ein Code Empfangen wird...
     unsigned long code = mySwitch.getReceivedValue();
@@ -147,80 +180,92 @@ void loop() {
       if (code == 1) {
         digitalWrite(pin1, HIGH);
       }
-
+      //Steuerung Tauchzellen
       schalter1 = CHECK_BIT(code, 0);
       schalter2 = CHECK_BIT(code, 1);
       schalter3 = CHECK_BIT(code, 2);
 
+      //Steuerung Seitentrieb
       long joystick_data = bitrange(code, 8, 3);
-      // joystick1 = bitrange(code, 10, 13);
 
+      Serial.print("Receiving: ");
+      Serial.print("S1:");
+      Serial.print(schalter1);
 
-  Serial.print("Receiving: ");
-  Serial.print("S1:");
-  Serial.print(schalter1);
-  //Auslesen der Tauchzellensensoren:
-  if (digitalRead(TAUCHZELLENSTOP1) == 0){
-    tauchzellenstopp1 = true;
-    tauchzelle1ausgefahren = true;
-    Serial.print(" Endsensor1:stop");
-
-  }
-  else {
-    tauchzellenstopp1 = false;
-  }
-
-  /*statt dem schalter1, der normalerweise vom Sender empfangen wird, wird jetzt der Testpin
-    verwendet. Ist der Testpin an, soll die Tauchzelle anfahren.*/
-  // schalter1 = digitalRead(TESTPIN);
-
-  if (schalter1) {
-    if (tauchzellenstopp1) {
-      stopTZ1();
-      Serial.print(" TZ1:stop");
-      EINFAHRTTS1 = millis();
-    }
-    //ausfahren
-    else {
-      Serial.print(" TZ1:ausfahren");
-      tauchzelle1ausgefahren = false;
-      turnTZ1l();
-    }
-  }
-  //schalter aus
-  else {
-    if (tauchzelle1ausgefahren){
-      //einfahren
-      Serial.print(" TZ1:einfahren");
-      turnTZ1r();
-      if (millis() - EINFAHRTTS1 > EINFAHRZEIT){
-        //genug eiungefahren, stop
-        Serial.print(" TZ1:eingefahren stop");
-        stopTZ1();
-        EINFAHRTTS1 = 0;
-        tauchzelle1ausgefahren = false;  
+      //Auslesen der Tauchzellensensoren:
+      if (digitalRead(TAUCHZELLENSTOP1) == 0){
+        tauchzellenstopp1 = true;
+        tauchzelle1ausgefahren = true;
+        Serial.print(" Endsensor1:stop");
       }
-    }
-  }
-  Serial.println("");
-  Serial.println("#################");
+      else {
+        tauchzellenstopp1 = false;
+      }
 
+      //TZ1
+      if (schalter1) {
+        if (tauchzellenstopp1) {
+          stopTZ1();
+          Serial.print(" TZ1:stop");
+          EINFAHRTTS1 = millis();
+        }
+        //ausfahren
+        else {
+          Serial.print(" TZ1:ausfahren");
+          tauchzelle1ausgefahren = false;
+          turnTZ1l();
+        }
+      }
+      //schalter aus
+      else {
+        if (tauchzelle1ausgefahren){
+          //einfahren
+          Serial.print(" TZ1:einfahren");
+          turnTZ1r();
+          if (millis() - EINFAHRTTS1 > EINFAHRZEIT){
+            //genug eiungefahren, stop
+            Serial.print(" TZ1:eingefahren stop");
+            stopTZ1();
+            EINFAHRTTS1 = 0;
+            tauchzelle1ausgefahren = false;  
+          }
+        }
+      }
+      Serial.println("");
 
-
-
-
-    /*Zweite Tauchzelle wird noch nicht getestet:
-
-      digitalWrite(TAUCHZELLEIN3, schalter2);
-      if (tauchzellenstopp2)
-      digitalWrite(TAUCHZELLEIN4, schalter2);  //tauchzelle ausschalten
-      else
-      digitalWrite(TAUCHZELLEIN4, 1 - schalter1);
-
-    */
+      //TZ2
+      if (schalter2) {
+        if (tauchzellenstopp2) {
+          stopTZ2();
+          Serial.print(" TZ2:stop");
+          EINFAHRTTS2 = millis();
+        }
+        //ausfahren
+        else {
+          Serial.print(" TZ2:ausfahren");
+          tauchzelle2ausgefahren = false;
+          turnTZ2l();
+        }
+      }
+    //schalter aus
+      else {
+        if (tauchzelle2ausgefahren){
+          //einfahren
+          Serial.print(" TZ2:einfahren");
+          turnTZ2r();
+          if (millis() - EINFAHRTTS1 > EINFAHRZEIT){
+            //genug eingefahren, stop
+            Serial.print(" TZ2:eingefahren stop");
+            stopTZ2();
+            EINFAHRTTS2 = 0;
+            tauchzelle2ausgefahren = false;  
+          }
+        }
+      }
+      Serial.println("#################"); 
 
     analogWrite(TAUCHZELLEENA, TAUCHZELLENGESCHWINDIGKEIT);
-    // analogWrite(TAUCHZELLEENB, TAUCHZELLENGESCHWINDIGKEIT);
+    analogWrite(TAUCHZELLEENB, TAUCHZELLENGESCHWINDIGKEIT);
 
 
       // Serial.print("Receiving: ");
@@ -236,11 +281,11 @@ void loop() {
       // debug(mySwitch);
 
     }
-   else {
+    else {
       Serial.print("Noise: ");
       Serial.println(code);
     }
 
-    mySwitch.resetAvailable();  // Hier wird der Empfänger "resettet"
+    mySwitch.resetAvailable();
   }
 }
