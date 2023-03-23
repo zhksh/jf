@@ -175,6 +175,7 @@ void loop() {
     }
     //ausfahren
     else {
+      tauchzelle1ausgefahren = false;
       turnTZ1l();
     }
   }
@@ -184,9 +185,10 @@ void loop() {
       //einfahren
       turnTZ1r();
       EINFAHRT1++;
-      if (EINFAHRT >= EINFAHRZEIT){
+      if (EINFAHRT1 >= EINFAHRZEIT){
+        //genug eiungefahren, stop
         stopTZ1();
-        EINFAHRT = 0;
+        EINFAHRT1 = 0;
         tauchzelle1ausgefahren = false;  
       }
     }
