@@ -31,7 +31,7 @@ bool tauchzelle2ausgefahren = false;
 
 int EINFAHRZEIT = 10000;
 
-int EINFAHRT1 = 0
+int EINFAHRT1 = 0;
 
 int pin = 1;
 int pin1;
