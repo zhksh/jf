@@ -155,11 +155,16 @@ void loop() {
       long joystick_data = bitrange(code, 8, 3);
       // joystick1 = bitrange(code, 10, 13);
 
-  //Auslesen der Tauchzellensensoren:
 
+  Serial.print("Receiving: ");
+  Serial.print("S1:");
+  Serial.print(schalter1);
+  //Auslesen der Tauchzellensensoren:
   if (digitalRead(TAUCHZELLENSTOPP1) == 1){
     tauchzellenstopp1 = true;
     tauchzelle1ausgefahren = true;
+    Serial.print(" Endsensor1:stop");
+
   }
   else {
     tauchzellenstopp1 = false;
@@ -172,9 +177,12 @@ void loop() {
   if (schalter1) {
     if (tauchzellenstopp1) {
       stopTZ1();
+      Serial.print(" TZ1:stop");
+
     }
     //ausfahren
     else {
+      Serial.print(" TZ1:ausfahren");
       tauchzelle1ausgefahren = false;
       turnTZ1l();
     }
@@ -183,10 +191,12 @@ void loop() {
   else {
     if (tauchzelle1ausgefahren){
       //einfahren
+      Serial.print(" TZ1:einfahren");
       turnTZ1r();
       EINFAHRT1++;
       if (EINFAHRT1 >= EINFAHRZEIT){
         //genug eiungefahren, stop
+        Serial.print(" TZ1:eingefahren stop");
         stopTZ1();
         EINFAHRT1 = 0;
         tauchzelle1ausgefahren = false;  
@@ -194,6 +204,7 @@ void loop() {
     }
   }
 
+  Serial.println("#######");
 
 
 
@@ -212,17 +223,16 @@ void loop() {
     analogWrite(TAUCHZELLEENA, TAUCHZELLENGESCHWINDIGKEIT);
     // analogWrite(TAUCHZELLEENB, TAUCHZELLENGESCHWINDIGKEIT);
 
-    Serial.print(schalter1);
 
-      Serial.print("Receiving: ");
-      Serial.print("S1:");
-      Serial.print(schalter1);
-      Serial.print(" | S2:");
-      Serial.print(schalter2);
-      Serial.print(" | S3:");
-      Serial.print(schalter3);
-      Serial.print(" | Joystick raw:");
-      Serial.println(joystick_data);
+      // Serial.print("Receiving: ");
+      // Serial.print("S1:");
+      // Serial.print(schalter1);
+      // Serial.print(" | S2:");
+      // Serial.print(schalter2);
+      // Serial.print(" | S3:");
+      // Serial.print(schalter3);
+      // Serial.print(" | Joystick raw:");
+      // Serial.println(joystick_data);
       // showJConfig(joystick_data);
       // debug(mySwitch);
 
