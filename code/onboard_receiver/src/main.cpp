@@ -21,6 +21,8 @@
 #define TAUCHZELLEENB 10
 #define TAUCHZELLENSTOP2 11
 
+
+
 #define TAUCHZELLENGESCHWINDIGKEIT 150
 
 #define CHECK_BIT(var,pos) ((var) & (1<<(pos))) != 0
