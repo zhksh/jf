@@ -21,6 +21,8 @@
 #define TAUCHZELLEENB 10
 #define TAUCHZELLENSTOP2 11
 
+
+
 #define TAUCHZELLENGESCHWINDIGKEIT 150
 
 #define CHECK_BIT(var,pos) ((var) & (1<<(pos))) != 0
@@ -122,6 +124,8 @@ void loop() {
       Serial.print("Receiving: ");
       Serial.print("S1:");
       Serial.print(schalter1);
+      Serial.print(" S2:");
+      Serial.print(schalter2);
 
       //Auslesen der Tauchzellensensoren:
       if (digitalRead(TAUCHZELLENSTOP1) == 0){
