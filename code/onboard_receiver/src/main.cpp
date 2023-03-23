@@ -17,11 +17,17 @@
 #define TAUCHZELLENSTOPP1 12
 #define TAUCHZELLENSTOPP2 13
 
+#define TESTPIN 2
+
+
 #define CHECK_BIT(var,pos) ((var) & (1<<(pos))) != 0
 
 
 bool tauchzellenstopp1;
 bool tauchzellenstopp2;
+
+bool tauchzelleausgefahren;
+int EINFAHRZEIT = 10000;
 
 int pin = 1;
 int pin1;
@@ -36,11 +42,14 @@ int joystick1;
 RCSwitch mySwitch = RCSwitch();
 
 void setup() {
+  pinMode(TESTPIN, INPUT_PULLUP);
   Serial.begin(baud);
   Serial.println("Receiver setup");
   mySwitch.enableReceive(RECEIVER_PIN);
   tauchzellenstopp1 = false;
   tauchzellenstopp2 = false;
+  tauchzelleausgefahren = false;
+
 }
 
 
@@ -129,39 +138,7 @@ void loop() {
       long joystick_data = bitrange(code, 8, 3);
       // joystick1 = bitrange(code, 10, 13);
 
-      if (digitalRead(TAUCHZELLENSTOPP1) == 1)
-        tauchzellenstopp1 = true;
-      if (digitalRead(TAUCHZELLENSTOPP2) == 1)
-        tauchzellenstopp2 = true;
-
-      digitalWrite(TAUCHZELLEIN1, schalter1);      
-
-      if (tauchzellenstopp1)
-        digitalWrite(TAUCHZELLEIN2, schalter1);  // tauchzelle ausschalte
-      else
-        digitalWrite(TAUCHZELLEIN2, 1 - schalter1);//tauczelle an
-
-      digitalWrite(TAUCHZELLEIN3, schalter2);
-      if (tauchzellenstopp2)
-        digitalWrite(TAUCHZELLEIN4, schalter2);  //tauchzelle ausschalten
-      else
-        digitalWrite(TAUCHZELLEIN4, 1 - schalter1);
-
-      analogWrite(TAUCHZELLEENA, TAUCHZELLENGESCHWINDIGKEIT);
-      analogWrite(TAUCHZELLEENB, TAUCHZELLENGESCHWINDIGKEIT);
-
-      Serial.print("Receiving: ");
-      Serial.print("S1:");
-      Serial.print(schalter1);
-      Serial.print(" | S2:");
-      Serial.print(schalter2);
-      Serial.print(" | S3:");
-      Serial.print(schalter3);
-      Serial.print(" | Joystick raw:");
-      Serial.println(joystick_data);
-      // showJConfig(joystick_data);
-      // debug(mySwitch);
-        //Auslesen der Tauchzellensensoren:
+  //Auslesen der Tauchzellensensoren:
 
   if (digitalRead(TAUCHZELLENSTOPP1) == 1)
     tauchzellenstopp1 = true;
@@ -205,6 +182,21 @@ void loop() {
 
     analogWrite(TAUCHZELLEENA, TAUCHZELLENGESCHWINDIGKEIT);
     analogWrite(TAUCHZELLEENB, TAUCHZELLENGESCHWINDIGKEIT);
+
+    Serial.print(schalter1);
+
+      Serial.print("Receiving: ");
+      Serial.print("S1:");
+      Serial.print(schalter1);
+      Serial.print(" | S2:");
+      Serial.print(schalter2);
+      Serial.print(" | S3:");
+      Serial.print(schalter3);
+      Serial.print(" | Joystick raw:");
+      Serial.println(joystick_data);
+      // showJConfig(joystick_data);
+      // debug(mySwitch);
+
     }
    else {
       Serial.print("Noise: ");
