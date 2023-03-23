@@ -210,7 +210,7 @@ void loop() {
     */
 
     analogWrite(TAUCHZELLEENA, TAUCHZELLENGESCHWINDIGKEIT);
-    analogWrite(TAUCHZELLEENB, TAUCHZELLENGESCHWINDIGKEIT);
+    // analogWrite(TAUCHZELLEENB, TAUCHZELLENGESCHWINDIGKEIT);
 
     Serial.print(schalter1);
 
