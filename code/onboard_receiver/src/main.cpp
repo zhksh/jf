@@ -47,7 +47,7 @@ int joystick1;
 RCSwitch mySwitch = RCSwitch();
 
 void setup() {
-  pinMode(TESTPIN, INPUT_PULLUP);
+  pinMode(TAUCHZELLENSTOP1, INPUT_PULLUP);
   Serial.begin(baud);
   Serial.println("Receiver setup");
   mySwitch.enableReceive(RECEIVER_PIN);
