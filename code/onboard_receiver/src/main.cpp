@@ -137,6 +137,16 @@ void loop() {
         tauchzellenstopp1 = false;
       }
 
+      //Auslesen der Tauchzellensensoren:
+      if (digitalRead(TAUCHZELLENSTOP2) == 0){
+        tauchzellenstopp2 = true;
+        tauchzelle2ausgefahren = true;
+        Serial.print(" Endsensor2:stop");
+      }
+      else {
+        tauchzellenstopp2 = false;
+      }
+
       //TZ1
       if (schalter1) {
         if (tauchzellenstopp1) {
