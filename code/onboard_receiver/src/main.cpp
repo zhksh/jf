@@ -15,8 +15,8 @@
 #define TAUCHZELLEENB 10
 #define TAUCHZELLENGESCHWINDIGKEIT 150
 
-#define TAUCHZELLENSTOPP1 12
-#define TAUCHZELLENSTOPP2 11
+#define TAUCHZELLENSTOP2 12
+#define TAUCHZELLENSTOP1 11
 
 #define TESTPIN 2
 
@@ -160,7 +160,7 @@ void loop() {
   Serial.print("S1:");
   Serial.print(schalter1);
   //Auslesen der Tauchzellensensoren:
-  if (digitalRead(TAUCHZELLENSTOPP1) == 1){
+  if (digitalRead(TAUCHZELLENSTOP1) == 1){
     tauchzellenstopp1 = true;
     tauchzelle1ausgefahren = true;
     Serial.print(" Endsensor1:stop");
