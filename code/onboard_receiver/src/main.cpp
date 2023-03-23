@@ -32,7 +32,7 @@ bool tauchzelle2ausgefahren = false;
 
 int EINFAHRZEIT = 10000;
 
-int EINFAHRT1 = 0;
+long EINFAHRTTS1 = 0;
 
 int pin = 1;
 int pin1;
@@ -178,7 +178,7 @@ void loop() {
     if (tauchzellenstopp1) {
       stopTZ1();
       Serial.print(" TZ1:stop");
-
+      EINFAHRTTS1 = millis();
     }
     //ausfahren
     else {
@@ -193,18 +193,17 @@ void loop() {
       //einfahren
       Serial.print(" TZ1:einfahren");
       turnTZ1r();
-      EINFAHRT1++;
-      if (EINFAHRT1 >= EINFAHRZEIT){
+      if (millis() - EINFAHRTTS1 > EINFAHRZEIT){
         //genug eiungefahren, stop
         Serial.print(" TZ1:eingefahren stop");
         stopTZ1();
-        EINFAHRT1 = 0;
+        EINFAHRTTS1 = 0;
         tauchzelle1ausgefahren = false;  
       }
     }
   }
-
-  Serial.println("#######");
+  Serial.println("");
+  Serial.println("#################");
 
 
 
