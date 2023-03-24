@@ -1,7 +1,8 @@
 #include <stdbool.h>
 #include <RCSwitch.h>
-// #include <debug.h>
 #include <util.h>
+#include <debug.h>
+
 
 #define RECEIVER_PIN 0     // entspircht pin 2
 #define PREFIX 0xff000000  //prefix für empfang der nachricht
