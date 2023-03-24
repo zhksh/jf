@@ -119,13 +119,22 @@ void loop() {
       //Steuerung Seitentrieb
       long joystick_data = bitrange(code, 8, 3);
 
+
       Serial.print("Receiving: ");
       Serial.print("S1:");
       Serial.print(schalter1);
-      Serial.print(" S2:");
+      Serial.print(" | S2:");
       Serial.print(schalter2);
+      // Serial.print(" | S3:");
+      // Serial.print(schalter3);
+      // Serial.print(" | Joystick raw:");
+      // Serial.println(joystick_data);
+      // showJConfig(joystick_data);
+      // debug(mySwitch);
 
-      //Auslesen der Tauchzellensensoren:
+ 
+
+      //TZ1
       if (digitalRead(TAUCHZELLENSTOP1) == 0){
         tauchzellenstopp1 = true;
         tauchzelle1ausgefahren = true;
@@ -135,17 +144,6 @@ void loop() {
         tauchzellenstopp1 = false;
       }
 
-      //Auslesen der Tauchzellensensoren:
-      if (digitalRead(TAUCHZELLENSTOP2) == 0){
-        tauchzellenstopp2 = true;
-        tauchzelle2ausgefahren = true;
-        Serial.print(" Endsensor2:stop");
-      }
-      else {
-        tauchzellenstopp2 = false;
-      }
-
-      //TZ1
       if (schalter1) {
         if (tauchzellenstopp1) {
           stopTZ1();
@@ -177,6 +175,15 @@ void loop() {
       Serial.println("");
 
       //TZ2
+      if (digitalRead(TAUCHZELLENSTOP2) == 0){
+        tauchzellenstopp2 = true;
+        tauchzelle2ausgefahren = true;
+        Serial.print(" Endsensor2:stop");
+      }
+      else {
+        tauchzellenstopp2 = false;
+      }
+      
       if (schalter2) {
         if (tauchzellenstopp2) {
           stopTZ2();
@@ -211,17 +218,6 @@ void loop() {
     analogWrite(TAUCHZELLEENB, TAUCHZELLENGESCHWINDIGKEIT);
 
 
-      // Serial.print("Receiving: ");
-      // Serial.print("S1:");
-      // Serial.print(schalter1);
-      // Serial.print(" | S2:");
-      // Serial.print(schalter2);
-      // Serial.print(" | S3:");
-      // Serial.print(schalter3);
-      // Serial.print(" | Joystick raw:");
-      // Serial.println(joystick_data);
-      // showJConfig(joystick_data);
-      // debug(mySwitch);
 
     }
     else {
