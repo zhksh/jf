@@ -41,6 +41,7 @@ int joystick2data(long j0x, long j0y, long j1x, long j1y){
   int data = 0;
   
   //j0x 7 j0x null 6   j0y 5 j0y null 4   j1x 3 j1x null 2    j1y 1 j1y null 0
+  
   //j0 null pos
   if (j0x > 470 && j0x < 600 ) data |= 1 << 6;  
   //j0 rechts set bit
