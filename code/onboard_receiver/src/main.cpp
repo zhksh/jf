@@ -32,10 +32,10 @@ bool tauchzellenstopp2 = false;
 bool tauchzelle1ausgefahren = false;
 bool tauchzelle2ausgefahren = false;
 
-int EINFAHRZEIT = 15000;
+unsigned long EINFAHRZEIT = 15000;
 
-long EINFAHRTTS1 = 0;
-long EINFAHRTTS2 = 0;
+unsigned long EINFAHRTTS1 = 0;
+unsigned long EINFAHRTTS2 = 0;
 
 int pin = 1;
 int pin1;
@@ -46,6 +46,16 @@ int schalter2;
 int schalter3;
 int joystick0;
 int joystick1;
+
+const int TPVO = 30;
+const int TPVU = 32;
+const int TPVL = 34;
+const int TPVR = 36;
+
+const int TPHO = 39;
+const int TPHU = 41;
+const int TPHL = 45;
+const int TPHR = 44;
 
 RCSwitch mySwitch = RCSwitch();
 
@@ -100,6 +110,50 @@ void stopTZ2(){
    digitalWrite(TAUCHZELLEIN4, LOW);
 }
 
+void debugJParsedConfig(JCD jcd){
+  String r = "rechts";
+  String l = "links";
+  String h = "hoch";
+  String ru = "runter";
+  String n = "neutral";
+  Serial.print("J0 ");
+  Serial.print("x: ");
+  if (jcd.j0.x.none){
+    Serial.print(n); 
+    // data -> j1 -> right = (data & 0b01000000) >> 6;
+  } 
+  else {
+      if (jcd.j0.x.right) Serial.print(r);
+      else if (jcd.j0.x.left) Serial.print(l);
+  }
+  Serial.print(" y: ");
+  if (jcd.j0.y.none) Serial.print(n);
+  else {
+    if (jcd.j0.y.up) Serial.print(h);
+    else if(jcd.j0.y.down) Serial.print(ru);
+  }
+  
+  Serial.println("");
+  Serial.print("J1:");
+  Serial.print(" x: ");
+  if (jcd.j1.x.none) Serial.print(n);
+  else {
+      if (jcd.j1.x.right) Serial.print(r);
+      else if (jcd.j1.x.left) Serial.print(l);
+
+  }
+  Serial.print(" y: ");
+  if (jcd.j1.y.none) Serial.print(n);
+  else {
+    if (jcd.j1.y.up) Serial.print(h);
+    else if (jcd.j1.y.down) Serial.print(ru);
+
+  }
+      Serial.println("");
+    // Serial.print("data:");
+    // Serial.print(data);
+    // Serial.println("");
+}
 
 void loop() {
   if (mySwitch.available()) {  // Wenn ein Code Empfangen wird...
@@ -117,7 +171,7 @@ void loop() {
       schalter3 = CHECK_BIT(code, 2);
 
       //Steuerung Seitentrieb
-      long joystick_data = bitrange(code, 8, 3);
+      long jcd_raw = bitrange(code, 8, 3);
 
 
       Serial.print("Receiving: ");
@@ -129,10 +183,12 @@ void loop() {
       // Serial.print(schalter3);
       // Serial.print(" | Joystick raw:");
       // Serial.println(joystick_data);
-      // showJConfig(joystick_data);
+      showJConfig(jcd_raw);
       // debug(mySwitch);
 
- 
+      JCD jcd = readJSData(jcd_raw);
+      debugJParsedConfig(jcd);
+
 
       //TZ1
       if (digitalRead(TAUCHZELLENSTOP1) == 0){
@@ -216,9 +272,6 @@ void loop() {
 
     analogWrite(TAUCHZELLEENA, TAUCHZELLENGESCHWINDIGKEIT);
     analogWrite(TAUCHZELLEENB, TAUCHZELLENGESCHWINDIGKEIT);
-
-
-
     }
     else {
       Serial.print("Noise: ");
