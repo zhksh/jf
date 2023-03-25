@@ -1,8 +1,7 @@
 #include <stdbool.h>
 #include <RCSwitch.h>
-#include <util.h>
 #include <debug.h>
-
+#include <util.h>
 
 #define RECEIVER_PIN 0     // entspircht pin 2
 #define PREFIX 0xff000000  //prefix für empfang der nachricht
@@ -33,7 +32,13 @@ bool tauchzellenstopp2 = false;
 bool tauchzelle1ausgefahren = false;
 bool tauchzelle2ausgefahren = false;
 
+bool tauchzelle2ausfahren = false;
+unsigned long TZ2AUSFAHRTTS = 0; 
+
+
 unsigned long EINFAHRZEIT = 15000;
+unsigned long AUSFAHAHRTZEIT2 = 7500;
+
 
 unsigned long EINFAHRTTS1 = 0;
 unsigned long EINFAHRTTS2 = 0;
@@ -205,9 +210,23 @@ void loop() {
         }
         //ausfahren
         else {
-          Serial.print(" TZ2:ausfahren");
-          tauchzelle2ausgefahren = false;
-          turnTZ2l();
+          if (!tauchzelle2ausgefahren){
+            TZ2AUSFAHRTTS = millis();
+          }
+          else {
+            if (millis() - TZ2AUSFAHRTTS > AUSFAHAHRTZEIT2){
+               stopTZ2();
+               Serial.print(" TZ2:stop");
+               tauchzelle2ausgefahren = true;
+            }
+            else {
+              Serial.print(" TZ2:ausfahren");
+              tauchzelle2ausgefahren = false;
+              turnTZ2l();
+            }
+           
+          }
+       
         }
       }
     //schalter aus
