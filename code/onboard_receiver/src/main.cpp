@@ -154,7 +154,8 @@ void loop() {
       Serial.print(" | S2:");
       Serial.print(schalter2);
    
-      showJConfig(jcd_raw);
+      // Serial.print(" | Joystick raw:");
+      // showJConfig(jcd_raw);
       // debug(mySwitch);
 
       JCD jcd = readJSData(jcd_raw);
