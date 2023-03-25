@@ -63,11 +63,11 @@ JCD readJSData(int data){
 
   cd.j1.x.none = CHECK_BIT(data, 2);
   cd.j1.x.right = CHECK_BIT(data, 3);
-  cd.j1.x.left = cd.j1.x.right; 
+  cd.j1.x.left = !cd.j1.x.right; 
 
   cd.j1.y.none = (data & 0b00000001);
   cd.j1.y.up = CHECK_BIT(data, 1);
-  cd.j1.y.down = cd.j1.y.up;
+  cd.j1.y.down = !cd.j1.y.up;
 
 
   return cd;

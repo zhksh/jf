@@ -71,9 +71,9 @@ void showJConfig(int data){
 
   String n = "neutral";
 
-  Serial.print("J0");
+  Serial.print("J0 ");
 
-  Serial.print("x: ");
+  Serial.print(" x: ");
   if ((data & 0b01000000) >> 6) Serial.print(n);
   else {
       if ((data & 0b10000000)) Serial.print(r);
@@ -89,7 +89,7 @@ void showJConfig(int data){
   }
   
   Serial.println("");
-  Serial.print("J1: ");
+  Serial.print("J1 ");
 
   Serial.print(" x: ");
   if ((data & 0b00000100) >> 2) Serial.print(n);
@@ -107,8 +107,8 @@ void showJConfig(int data){
   }
       Serial.println("");
 
-    Serial.print("data:");
-    Serial.print(data);
+    // Serial.print("data:");
+    // Serial.print(data);
     Serial.println("");
 }
 

@@ -80,8 +80,7 @@ long decode(long msg) {
 
 bool checkPrefix(unsigned long original_msg, long  decoded) {
   bool passed = (decoded | PREFIX) == original_msg;
-  // Serial.print("msg");
-  // Serial.print(original_msg);
+
   return passed;
 }
 
@@ -154,10 +153,7 @@ void loop() {
       Serial.print(schalter1);
       Serial.print(" | S2:");
       Serial.print(schalter2);
-      // Serial.print(" | S3:");
-      // Serial.print(schalter3);
-      // Serial.print(" | Joystick raw:");
-      // Serial.println(joystick_data);
+   
       showJConfig(jcd_raw);
       // debug(mySwitch);
 
