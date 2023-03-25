@@ -32,12 +32,12 @@ bool tauchzellenstopp2 = false;
 bool tauchzelle1ausgefahren = false;
 bool tauchzelle2ausgefahren = false;
 
-bool tauchzelle2ausfahren = false;
+bool tauchzelle2faertaus = false;
 unsigned long TZ2AUSFAHRTTS = 0; 
 
 
 unsigned long EINFAHRZEIT = 15000;
-unsigned long AUSFAHAHRTZEIT2 = 7500;
+unsigned long AUSFAHRTZEIT2 = 7500;
 
 
 unsigned long EINFAHRTTS1 = 0;
@@ -88,32 +88,45 @@ bool checkPrefix(unsigned long original_msg, long  decoded) {
 void turnTZ1r(){
     digitalWrite(TAUCHZELLE10, LOW);
     digitalWrite(TAUCHZELLE11, HIGH);
+    Serial.print(" TZ1:einfahren");
 }
 
 void turnTZ1l(){
     digitalWrite(TAUCHZELLE10, HIGH);
     digitalWrite(TAUCHZELLE11, LOW);
+    Serial.print(" TZ1:ausfahren");
 }
 
 void stopTZ1(){
    digitalWrite(TAUCHZELLE10, LOW);
    digitalWrite(TAUCHZELLE11, LOW);
+   Serial.print(" TZ1:stop");
+
 }
 
 // Tauchzelle 2
 void turnTZ2r(){
     digitalWrite(TAUCHZELLEIN3, LOW);
     digitalWrite(TAUCHZELLEIN4, HIGH);
+    Serial.print(" TZ2:einfahren");
+
 }
 
 void turnTZ2l(){
     digitalWrite(TAUCHZELLEIN3, HIGH);
     digitalWrite(TAUCHZELLEIN4, LOW);
+    tauchzelle2faertaus = true;
+    Serial.print(" TZ2:ausfahren");
 }
 
 void stopTZ2(){
    digitalWrite(TAUCHZELLEIN3, LOW);
    digitalWrite(TAUCHZELLEIN4, LOW);
+   tauchzelle2faertaus = false;
+   TZ2AUSFAHRTTS = 0;
+   EINFAHRTTS2 = 0;
+
+   Serial.print(" TZ2:stop");
 }
 
 
@@ -165,12 +178,10 @@ void loop() {
       if (schalter1) {
         if (tauchzellenstopp1) {
           stopTZ1();
-          Serial.print(" TZ1:stop");
           EINFAHRTTS1 = millis();
         }
         //ausfahren
         else {
-          Serial.print(" TZ1:ausfahren");
           tauchzelle1ausgefahren = false;
           turnTZ1l();
         }
@@ -179,11 +190,10 @@ void loop() {
       else {
         if (tauchzelle1ausgefahren){
           //einfahren
-          Serial.print(" TZ1:einfahren");
           turnTZ1r();
           if (millis() - EINFAHRTTS1 > EINFAHRZEIT){
             //genug eiungefahren, stop
-            Serial.print(" TZ1:eingefahren stop");
+            Serial.print(" TZ1:eingefahren");
             stopTZ1();
             EINFAHRTTS1 = 0;
             tauchzelle1ausgefahren = false;  
@@ -203,43 +213,35 @@ void loop() {
       }
       
       if (schalter2) {
+        //endschalter ein
         if (tauchzellenstopp2) {
           stopTZ2();
-          Serial.print(" TZ2:stop");
           EINFAHRTTS2 = millis();
         }
         //ausfahren
         else {
-          if (!tauchzelle2ausgefahren){
+          if (!tauchzelle2faertaus){
             TZ2AUSFAHRTTS = millis();
           }
-          else {
-            if (millis() - TZ2AUSFAHRTTS > AUSFAHAHRTZEIT2){
-               stopTZ2();
-               Serial.print(" TZ2:stop");
-               tauchzelle2ausgefahren = true;
-            }
-            else {
-              Serial.print(" TZ2:ausfahren");
-              tauchzelle2ausgefahren = false;
-              turnTZ2l();
-            }
-           
+          if (millis() - TZ2AUSFAHRTTS > AUSFAHRTZEIT2){
+              stopTZ2();
+              tauchzelle2ausgefahren = true;
           }
-       
+          else {
+            tauchzelle2ausgefahren = false;
+            turnTZ2l();
+          }                  
         }
       }
     //schalter aus
       else {
         if (tauchzelle2ausgefahren){
           //einfahren
-          Serial.print(" TZ2:einfahren");
           turnTZ2r();
           if (millis() - EINFAHRTTS2 > EINFAHRZEIT){
             //genug eingefahren, stop
-            Serial.print(" TZ2:eingefahren stop");
+            Serial.print(" TZ2:eingefahren");
             stopTZ2();
-            EINFAHRTTS2 = 0;
             tauchzelle2ausgefahren = false;  
           }
         }
