@@ -12,7 +12,8 @@ class SubUI(QWidget):
     update_interval = 300    
     baud_rate = 9600
     datadelim = 'DATA|'
-    sensor_names = ['tb', 'tmp0', 'tmp1', "aux"]
+    sensor_names = [('Tauchsensor','tb'), ('Temperatur0','tmp0'), 
+                    ('Temperatur1','tmp1'), ('Aux','aux')]
 
     def __init__(self, port):
         super().__init__()
@@ -42,19 +43,19 @@ class SubUI(QWidget):
         # grid.setRowStretch(0, 2) 
         grid.setColumnStretch(0,2) 
         self.setLayout(grid)
-        self.connect()
+        # self.connect()
         self.sensor_map = {}
 
-        self.setFixedSize(640, 480)
+        self.setFixedSize(700, 480)
         font_val = self.font()
-        font_val.setPointSize(70)
+        font_val.setPointSize(50)
         font_label = self.font()
-        font_label.setPointSize(40)      
+        font_label.setPointSize(30)      
 
         positions = [(i, j) for i in range(2) for j in range(2)]
-        for position, name in zip(positions, self.sensor_names):
+        for position, (lname,name) in zip(positions, self.sensor_names):
             val = QLabel("0")
-            label = QLabel(name)
+            label = QLabel(lname)
             layout = QVBoxLayout()
             val.setFont(font_val)
             label.setFont(font_label)
