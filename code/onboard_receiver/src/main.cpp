@@ -212,19 +212,19 @@ void loop() {
     //schalter aus
       else {
         //einfahren geht nur nachdem komplett ausgehfahren wurde
-        if (tauchzelle2ausgefahren){
-          if (!tauchzelle2faertein){
-            EINFAHRTTS2 = millis();
+        if (tauchzelle1ausgefahren){
+          if (!tauchzelle1faertein){
+            EINFAHRTTS1 = millis();
           }
-          if (millis() - EINFAHRTTS2 > EINFAHRZEIT){
+          if (millis() - EINFAHRTTS1 > EINFAHRZEIT){
             //genug eingefahren, stop
-            Serial.print(" TZ2:eingefahren");
-            stopTZ2();
-            tauchzelle2ausgefahren = false;  
+            Serial.print(" TZ1:eingefahren");
+            stopTZ1();
+            tauchzelle1ausgefahren = false;  
           }
           else {
              //einfahren
-            turnTZ2r();
+            turnTZ1r();
           }
         }
       }
