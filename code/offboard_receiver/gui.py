@@ -72,12 +72,14 @@ class SubUI(QWidget):
 
 
     def getSensorValues(self):
-        pl = self.cnx.readline().decode()
-        print(pl)
-        decoded = self.decode_(pl)
-        if (len(decoded)):
-            for s, v in decoded.items(): self.sensor_map[s].setText(v)
-
+        try:
+            pl = self.cnx.readline().decode()
+            print(pl)
+            decoded = self.decode_(pl)
+            if (len(decoded)):
+                for s, v in decoded.items(): self.sensor_map[s].setText(v)
+        except Exception as e:
+            pass
 
     def decode_(self, bytestr):
         data = {}

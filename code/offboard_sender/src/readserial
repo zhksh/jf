@@ -1,4 +1,4 @@
 #!/bin/bash
 
-stty -F $1 raw 9600
+stty  $1 raw 9600
 cat $1

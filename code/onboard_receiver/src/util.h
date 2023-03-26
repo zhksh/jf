@@ -63,14 +63,57 @@ JCD readJSData(int data){
 
   cd.j1.x.none = CHECK_BIT(data, 2);
   cd.j1.x.right = CHECK_BIT(data, 3);
-  cd.j1.x.left = cd.j1.x.right; 
+  cd.j1.x.left = !cd.j1.x.right; 
 
   cd.j1.y.none = (data & 0b00000001);
   cd.j1.y.up = CHECK_BIT(data, 1);
-  cd.j1.y.down = cd.j1.y.up;
+  cd.j1.y.down = !cd.j1.y.up;
 
 
   return cd;
 };
 
 
+void debugJParsedConfig(JCD jcd){
+  String r = "rechts";
+  String l = "links";
+  String h = "hoch";
+  String ru = "runter";
+  String n = "neutral";
+  Serial.print("J0 ");
+  Serial.print("x: ");
+  if (jcd.j0.x.none){
+    Serial.print(n); 
+  } 
+  else {
+      if (jcd.j0.x.right) Serial.print(r);
+      else if (jcd.j0.x.left) Serial.print(l);
+  }
+  Serial.print(" y: ");
+  if (jcd.j0.y.none) Serial.print(n);
+  else {
+    if (jcd.j0.y.up) Serial.print(h);
+    else if(jcd.j0.y.down) Serial.print(ru);
+  }
+  
+  Serial.println("");
+  Serial.print("J1:");
+  Serial.print(" x: ");
+  if (jcd.j1.x.none) Serial.print(n);
+  else {
+      if (jcd.j1.x.right) Serial.print(r);
+      else if (jcd.j1.x.left) Serial.print(l);
+
+  }
+  Serial.print(" y: ");
+  if (jcd.j1.y.none) Serial.print(n);
+  else {
+    if (jcd.j1.y.up) Serial.print(h);
+    else if (jcd.j1.y.down) Serial.print(ru);
+
+  }
+      Serial.println("");
+    // Serial.print("data:");
+    // Serial.print(data);
+    // Serial.println("");
+}

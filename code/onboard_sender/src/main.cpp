@@ -62,10 +62,10 @@ void setup() {
   temp1Sensor.begin();
 
   mySwitch.enableTransmit(TRANSMITTER_PIN);
-  mySwitch.setProtocol(1);
+  // mySwitch.setProtocol(1);
 
  // Optional set number of transmission repetitions.
-  mySwitch.setRepeatTransmit(3);
+  mySwitch.setRepeatTransmit(8);
 }
 
 void printToSerial(float tb, float temp0, float temp1, float aux){
