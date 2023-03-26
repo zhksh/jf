@@ -33,9 +33,10 @@ bool tauchzelle1ausgefahren = false;
 bool tauchzelle2ausgefahren = false;
 
 bool tauchzelle2faertaus = false;
+bool tauchzelle2faertein = false;
+
+
 unsigned long TZ2AUSFAHRTTS = 0; 
-
-
 unsigned long EINFAHRZEIT = 15000;
 unsigned long AUSFAHRTZEIT2 = 7500;
 
@@ -107,6 +108,7 @@ void stopTZ1(){
 void turnTZ2r(){
     digitalWrite(TAUCHZELLEIN3, LOW);
     digitalWrite(TAUCHZELLEIN4, HIGH);
+    tauchzelle2faertein = true;
     Serial.print(" TZ2:einfahren");
 
 }
@@ -122,6 +124,7 @@ void stopTZ2(){
    digitalWrite(TAUCHZELLEIN3, LOW);
    digitalWrite(TAUCHZELLEIN4, LOW);
    tauchzelle2faertaus = false;
+   tauchzelle2faertein = false;
    TZ2AUSFAHRTTS = 0;
    EINFAHRTTS2 = 0;
 
@@ -158,8 +161,8 @@ void loop() {
       // showJConfig(jcd_raw);
       // debug(mySwitch);
 
-      JCD jcd = readJSData(jcd_raw);
-      debugJParsedConfig(jcd);
+      // JCD jcd = readJSData(jcd_raw);
+      // debugJParsedConfig(jcd);
 
 
       //TZ1
@@ -213,10 +216,10 @@ void loop() {
         //endschalter ein
         if (tauchzellenstopp2) {
           stopTZ2();
-          EINFAHRTTS2 = millis();
         }
         //ausfahren
         else {
+          //tauchzelle ist eingefahren
           if (!tauchzelle2faertaus){
             TZ2AUSFAHRTTS = millis();
           }
@@ -232,14 +235,20 @@ void loop() {
       }
     //schalter aus
       else {
+        //einfahren geht nur nachdem komplett ausgehfahren wurde
         if (tauchzelle2ausgefahren){
-          //einfahren
-          turnTZ2r();
+          if (!tauchzelle2faertein){
+            EINFAHRTTS2 = millis();
+          }
           if (millis() - EINFAHRTTS2 > EINFAHRZEIT){
             //genug eingefahren, stop
             Serial.print(" TZ2:eingefahren");
             stopTZ2();
             tauchzelle2ausgefahren = false;  
+          }
+          else {
+             //einfahren
+            turnTZ2r();
           }
         }
       }

@@ -14,6 +14,7 @@ class SubUI(QWidget):
     datadelim = 'DATA|'
     sensor_names = ['tb', 'tmp0', 'tmp1', "aux"]
 
+
     def __init__(self, port):
         super().__init__()
         self.port = port
