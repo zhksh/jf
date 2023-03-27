@@ -32,6 +32,9 @@ bool tauchzellenstopp2 = false;
 bool tauchzelle1ausgefahren = false;
 bool tauchzelle2ausgefahren = false;
 
+bool tauchzelle1eingefahren = false;
+bool tauchzelle2eingefahren = false;
+
 bool tauchzelle1faertaus = false;
 bool tauchzelle1faertein = false;
 
@@ -178,7 +181,7 @@ void handleTZ(){
         }
         else {
           //tauchzelle fährt nicht gerade aus
-          if (!tauchzelle1faerteaus){
+          if (!tauchzelle1faertaus){
             if (!tauchzelle1faertein){
               //start timer ausfahrt
               TZ1AUSFAHRTTS = millis();
