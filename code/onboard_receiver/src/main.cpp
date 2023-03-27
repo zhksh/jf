@@ -55,8 +55,8 @@ int pin = 1;
 int pin1;
 
 int baud = 9600;
-int schalter1;
-int schalter2;
+int schalter1 = 0;
+int schalter2 = 0;
 int schalter3;
 int joystick0;
 int joystick1;
