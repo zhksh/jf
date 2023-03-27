@@ -208,7 +208,7 @@ void handleTZ(){
   }
 
   //TZ2
-  if (digitalRead(TAUCHZELLENSTOP) == 0){
+  if (digitalRead(TAUCHZELLENSTOP2) == 0){
     tauchzelle2ausgefahren = true;
     Serial.print(" Endsensor2:stop");
     stopTZ2();
