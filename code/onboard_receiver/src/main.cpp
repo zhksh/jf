@@ -51,7 +51,7 @@ unsigned long AUSFAHRTZEIT1 = 4000;
 unsigned long EINFAHRTTS1 = 0;
 unsigned long EINFAHRTTS2 = 0;
 
-int pin = 1;
+int TEST_PIN = 2;
 int pin1;
 
 int baud = 9600;
@@ -79,7 +79,9 @@ void setup() {
 
   Serial.begin(baud);
   Serial.println("Receiver setup");
-  mySwitch.enableReceive(RECEIVER_PIN);
+  // mySwitch.enableReceive(RECEIVER_PIN);
+
+  pinMode(TEST_PIN, INPUT);
 }
 
 long decode(long msg) {
@@ -263,36 +265,42 @@ void handleTZ(){
 
 void loop() {  
 
-  if (mySwitch.available()) {  // Wenn ein Code Empfangen wird...
-    unsigned long code = mySwitch.getReceivedValue();
-    long decoded = decode(code);  
+  // if (mySwitch.available()) {  // Wenn ein Code Empfangen wird...
+  //   unsigned long code = mySwitch.getReceivedValue();
+  //   long decoded = decode(code);  
 
-    bool legit = checkPrefix(code, decoded);
-    if (legit) {
-      if (code == 1) {
-        digitalWrite(pin1, HIGH);
-      }
-      //Steuerung Tauchzellen
-      schalter1 = CHECK_BIT(code, 0);
-      schalter2 = CHECK_BIT(code, 1);
-      schalter3 = CHECK_BIT(code, 2);
+  //   bool legit = checkPrefix(code, decoded);
+  //   if (legit) {
+  //     if (code == 1) {
+  //       digitalWrite(pin1, HIGH);
+  //     }
+  //     //Steuerung Tauchzellen
+  //     schalter1 = CHECK_BIT(code, 0);
+  //     schalter2 = CHECK_BIT(code, 1);
+  //     schalter3 = CHECK_BIT(code, 2);
 
-      //Steuerung Seitentrieb
-      // long jcd_raw = bitrange(code, 8, 3);
+  //     //Steuerung Seitentrieb
+  //     // long jcd_raw = bitrange(code, 8, 3);
 
-      Serial.print("Receiving: ");
-      Serial.print("S1:");
-      Serial.print(schalter1);
-      Serial.print(" | S2:");
-      Serial.print(schalter2);
+  //     Serial.print("Receiving: ");
+  //     Serial.print("S1:");
+  //     Serial.print(schalter1);
+  //     Serial.print(" | S2:");
+  //     Serial.print(schalter2);
 
-    }
-    else {
-      Serial.print("Noise: ");
-      Serial.println(code);
-    }
-    mySwitch.resetAvailable();
-  }
+  //   }
+  //   else {
+  //     Serial.print("Noise: ");
+  //     Serial.println(code);
+  //   }
+  //   mySwitch.resetAvailable();
+  // }
+
+  schalter1 = digitalRead(TEST_PIN);
+  schalter2 = schalter1; 
+  Serial.print("PIN SIGNAL: ");
+  Serial.print(schalter1);
+
 
   handleTZ();
 }
