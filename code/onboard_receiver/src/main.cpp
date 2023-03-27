@@ -175,7 +175,7 @@ void handleTZ(){
   else {
     if (schalter1) {  
       if (!tauchzelle1ausgefahren){
-        if ((millis() - TZ1AUSFAHRTTS) >= AUSFAHRTZEIT1){
+        if ((TZ1AUSFAHRTTS > 0) && (millis() - TZ1AUSFAHRTTS) >= AUSFAHRTZEIT1){
           stopTZ1();
           tauchzelle1ausgefahren = true;
         }
@@ -195,21 +195,23 @@ void handleTZ(){
     else {
       //nur wenn ganz ausgefahren, wieder einfahren
       if (tauchzelle1ausgefahren){
-         if ((millis() - EINFAHRTTS1) > EINFAHRZEIT){
-          //genug eingefahren, stop
-          Serial.print(" TZ1:eingefahren");
-          stopTZ1();
-          tauchzelle1eingefahren = false;  
-        }
-        else {
-           if (!tauchzelle1faertein){
+         if (!tauchzelle1faertein){
             //start timer einfahrt
             EINFAHRTTS1 = millis();
           }
-          //einfahren
-          turnTZ1r();
+          if ((EINFAHRTTS1 > 0) && (millis() - EINFAHRTTS1) > EINFAHRZEIT){
+            //genug eingefahren, stop
+            Serial.print(" TZ1:eingefahren");
+            stopTZ1();
+            tauchzelle1eingefahren = false;  
+          }
+         else {
+            //einfahren
+            turnTZ1r();
+         }      
+        
         }
-      }
+      
     }
   }
 
