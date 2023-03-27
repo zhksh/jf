@@ -27,17 +27,13 @@
 
 
 bool tauchzellenstopp1 = false;
-bool tauchzellenstopp2 = false;
-
 bool tauchzelle1ausgefahren = false;
-bool tauchzelle2ausgefahren = false;
-
-bool tauchzelle1eingefahren = false;
-bool tauchzelle2eingefahren = false;
-
 bool tauchzelle1faertaus = false;
 bool tauchzelle1faertein = false;
 
+
+bool tauchzellenstopp2 = false;
+bool tauchzelle2ausgefahren = false;
 bool tauchzelle2faertaus = false;
 bool tauchzelle2faertein = false;
 
@@ -84,9 +80,8 @@ void setup() {
 
   Serial.begin(baud);
   Serial.println("Receiver setup");
-  // mySwitch.enableReceive(RECEIVER_PIN);
-
-  pinMode(TEST_PIN, INPUT);
+  mySwitch.enableReceive(RECEIVER_PIN);
+  // pinMode(TEST_PIN, INPUT);
 }
 
 long decode(long msg) {
@@ -181,8 +176,8 @@ void handleTZ(){
         }
         else {
           //tauchzelle fährt nicht gerade aus
-          if (!tauchzelle1faertaus){
-            if (!tauchzelle1faertein){
+          if (!tauchzelle1faertein){
+            if (!tauchzelle1faertaus){
               //start timer ausfahrt
               TZ1AUSFAHRTTS = millis();
             }
@@ -203,7 +198,7 @@ void handleTZ(){
           //genug eingefahren, stop
           Serial.print(" TZ1:eingefahren");
           stopTZ1();
-          tauchzelle1eingefahren = false;  
+          tauchzelle1ausgefahren = false;
         }
         else {
           //einfahren
@@ -213,54 +208,55 @@ void handleTZ(){
     }
   }
 
-  // //TZ2
-  // if (digitalRead(TAUCHZELLENSTOP2) == 0){
-  //   tauchzelle2ausgefahren = true;
-  //   Serial.print(" Endsensor2:stop");
-  //   stopTZ2();
-  // }
-  // else {
-  //   if (schalter2) {    
-  //     //tauchzelle fährt nicht gerade
-  //     if (!tauchzelle2faertein){
-  //       //tauchzelle ist eingefahren
-  //       if (!tauchzelle2faertaus){
-  //         //start timer ausfahrt
-  //         TZ2AUSFAHRTTS = millis();
-  //       }
-  //       if ((millis() - TZ2AUSFAHRTTS) >= AUSFAHRTZEIT2){
-  //           stopTZ2();
-  //           tauchzelle2ausgefahren = true;
-  //       }
-  //       else {
-  //         tauchzelle2ausgefahren = false;
-  //         turnTZ2l();
-  //       }        
-  //     }       
-  //   }
-  //   //schalter aus
-  //   else {
-  //     //nur wenn ganz ausgefahren, wieder einfahren
-  //     if (tauchzelle2ausgefahren){
-  //       if (!tauchzelle2faertein){
-  //         //start timer einfahrt
-  //         EINFAHRTTS2 = millis();
-  //       }
+  //TZ2
+  if (digitalRead(TAUCHZELLENSTOP2) == 0){
+    tauchzelle2ausgefahren = true;
+    Serial.print(" Endsensor2:stop");
+    stopTZ2();
+  }
+  else {
+    if (schalter2) {  
+      if (!tauchzelle2ausgefahren){
+        if ((TZ2AUSFAHRTTS > 0) && (millis() - TZ2AUSFAHRTTS) >= AUSFAHRTZEIT2){
+          stopTZ2();
+          tauchzelle2ausgefahren = true;
+        }
+        else {
+          //tauchzelle fährt nicht gerade aus
+          if (!tauchzelle2faertein){
+            if (!tauchzelle2faertaus){
+              //start timer ausfahrt
+              TZ2AUSFAHRTTS = millis();
+            }
+            //ausfahren
+            turnTZ2l();      
+          }       
+        }         
+      }     
+    }
+    //schalter aus
+    else {
+      //nur wenn ganz ausgefahren, wieder einfahren
+      if (tauchzelle2ausgefahren){
+        if (!tauchzelle2faertein){
+          //start timer einfahrt
+          EINFAHRTTS2 = millis();
+        }
+        if ((EINFAHRTTS2 > 0) && (millis() - EINFAHRTTS2) > EINFAHRZEIT){
+          //genug eingefahren, stop
+          Serial.print(" TZ2:eingefahren");
+          stopTZ2();
+          tauchzelle2ausgefahren = false;
+        }
+        else {
+          //einfahren
+          turnTZ2r();
+        }       
+      }      
+    }
+  }
 
-  //       if ((millis() - EINFAHRTTS2) > EINFAHRZEIT){
-  //         //genug eingefahren, stop
-  //         Serial.print(" TZ2:eingefahren");
-  //         stopTZ2();
-  //         tauchzelle2ausgefahren = false;  
-  //       }
-  //       else {
-  //         //einfahren
-  //         turnTZ2r();
-  //       }
-  //     }
-  //   }
-  // }
-  
+  Serial.println("");
   Serial.println("#################"); 
 
   analogWrite(TAUCHZELLEENA, TAUCHZELLENGESCHWINDIGKEIT);
@@ -305,11 +301,8 @@ void loop() {
   // Serial.print("PIN SIGNAL: ");
   // Serial.print(schalter1);
   // Serial.println("");
-  tauchzelle1ausgefahren = true;
 
-  if (!run){
-    if (schalter1) run = true;
-  }
+  run |= schalter1;
   if (run){
     handleTZ();
   }
