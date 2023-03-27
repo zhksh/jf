@@ -54,6 +54,8 @@ unsigned long EINFAHRTTS2 = 0;
 int TEST_PIN = 2;
 int pin1;
 
+boolean run = false;
+
 int baud = 9600;
 int schalter1 = 0;
 int schalter2 = 0;
@@ -300,6 +302,10 @@ void loop() {
   Serial.print("PIN SIGNAL: ");
   Serial.print(schalter1);
 
-
-  handleTZ();
+  if (!run){
+    if (schalter1) run = true;
+  }
+  if (run){
+    handleTZ();
+  }
 }
