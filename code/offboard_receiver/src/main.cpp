@@ -98,6 +98,8 @@ void loop() {
     long decoded = decode(msg);  
 
     bool legit = checkPrefix(msg, decoded);
+    bool legit = true;
+
     if (legit) {
       long tb_val =  (msg & TB_MASK) >> TB_POS;
       long temp1_val = (msg & TEMP1_MASK) >> TEMP1_POS;
