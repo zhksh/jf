@@ -195,23 +195,21 @@ void handleTZ(){
     else {
       //nur wenn ganz ausgefahren, wieder einfahren
       if (tauchzelle1ausgefahren){
-         if (!tauchzelle1faertein){
-            //start timer einfahrt
-            EINFAHRTTS1 = millis();
-          }
-          if ((EINFAHRTTS1 > 0) && (millis() - EINFAHRTTS1) > EINFAHRZEIT){
-            //genug eingefahren, stop
-            Serial.print(" TZ1:eingefahren");
-            stopTZ1();
-            tauchzelle1eingefahren = false;  
-          }
-         else {
-            //einfahren
-            turnTZ1r();
-         }      
-        
+        if (!tauchzelle1faertein){
+          //start timer einfahrt
+          EINFAHRTTS1 = millis();
         }
-      
+        if ((EINFAHRTTS1 > 0) && (millis() - EINFAHRTTS1) > EINFAHRZEIT){
+          //genug eingefahren, stop
+          Serial.print(" TZ1:eingefahren");
+          stopTZ1();
+          tauchzelle1eingefahren = false;  
+        }
+        else {
+          //einfahren
+          turnTZ1r();
+        }       
+      }      
     }
   }
 
@@ -271,42 +269,42 @@ void handleTZ(){
 
 void loop() {  
 
-  // if (mySwitch.available()) {  // Wenn ein Code Empfangen wird...
-  //   unsigned long code = mySwitch.getReceivedValue();
-  //   long decoded = decode(code);  
+  if (mySwitch.available()) {  // Wenn ein Code Empfangen wird...
+    unsigned long code = mySwitch.getReceivedValue();
+    long decoded = decode(code);  
 
-  //   bool legit = checkPrefix(code, decoded);
-  //   if (legit) {
-  //     if (code == 1) {
-  //       digitalWrite(pin1, HIGH);
-  //     }
-  //     //Steuerung Tauchzellen
-  //     schalter1 = CHECK_BIT(code, 0);
-  //     schalter2 = CHECK_BIT(code, 1);
-  //     schalter3 = CHECK_BIT(code, 2);
+    bool legit = checkPrefix(code, decoded);
+    if (legit) {
+      if (code == 1) {
+        digitalWrite(pin1, HIGH);
+      }
+      //Steuerung Tauchzellen
+      schalter1 = CHECK_BIT(code, 0);
+      schalter2 = CHECK_BIT(code, 1);
+      schalter3 = CHECK_BIT(code, 2);
 
-  //     //Steuerung Seitentrieb
-  //     // long jcd_raw = bitrange(code, 8, 3);
+      //Steuerung Seitentrieb
+      // long jcd_raw = bitrange(code, 8, 3);
 
-  //     Serial.print("Receiving: ");
-  //     Serial.print("S1:");
-  //     Serial.print(schalter1);
-  //     Serial.print(" | S2:");
-  //     Serial.print(schalter2);
+      Serial.print("Receiving: ");
+      Serial.print("S1:");
+      Serial.print(schalter1);
+      Serial.print(" | S2:");
+      Serial.print(schalter2);
 
-  //   }
-  //   else {
-  //     Serial.print("Noise: ");
-  //     Serial.println(code);
-  //   }
-  //   mySwitch.resetAvailable();
-  // }
+    }
+    else {
+      Serial.print("Noise: ");
+      Serial.println(code);
+    }
+    mySwitch.resetAvailable();
+  }
 
-  schalter1 = digitalRead(TEST_PIN);
-  schalter2 = schalter1; 
-  Serial.print("PIN SIGNAL: ");
-  Serial.print(schalter1);
-  Serial.println("");
+  // schalter1 = digitalRead(TEST_PIN);
+  // schalter2 = schalter1; 
+  // Serial.print("PIN SIGNAL: ");
+  // Serial.print(schalter1);
+  // Serial.println("");
   tauchzelle1ausgefahren = true;
 
   if (!run){
