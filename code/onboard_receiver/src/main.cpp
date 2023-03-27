@@ -43,8 +43,8 @@ unsigned long TZ2AUSFAHRTTS = 0;
 unsigned long TZ1AUSFAHRTTS = 0; 
 
 unsigned long EINFAHRZEIT = 15000;
-unsigned long AUSFAHRTZEIT2 = 7500;
-unsigned long AUSFAHRTZEIT1 = 7500;
+unsigned long AUSFAHRTZEIT2 = 4000;
+unsigned long AUSFAHRTZEIT1 = 4000;
 
 
 
