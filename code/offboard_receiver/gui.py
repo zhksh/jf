@@ -96,7 +96,7 @@ class SubUI(QWidget):
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        path = '/dev/ttyACM0'
+        path = 'COM8'
     else:
         path = sys.argv[1]
     app = QApplication(sys.argv)
