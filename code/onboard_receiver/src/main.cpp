@@ -145,42 +145,11 @@ void stopTZ2(){
    Serial.print(" TZ2:stop");
 }
 
+void handleTZ(){
 
-void loop() {
-  if (mySwitch.available()) {  // Wenn ein Code Empfangen wird...
-    unsigned long code = mySwitch.getReceivedValue();
-    long decoded = decode(code);  
-
-    bool legit = checkPrefix(code, decoded);
-    if (legit) {
-      if (code == 1) {
-        digitalWrite(pin1, HIGH);
-      }
-      //Steuerung Tauchzellen
-      schalter1 = CHECK_BIT(code, 0);
-      schalter2 = CHECK_BIT(code, 1);
-      schalter3 = CHECK_BIT(code, 2);
-
-      //Steuerung Seitentrieb
-      long jcd_raw = bitrange(code, 8, 3);
-
-
-      Serial.print("Receiving: ");
-      Serial.print("S1:");
-      Serial.print(schalter1);
-      Serial.print(" | S2:");
-      Serial.print(schalter2);
-   
-      // Serial.print(" | Joystick raw:");
-      // showJConfig(jcd_raw);
-      // debug(mySwitch);
-
-      // JCD jcd = readJSData(jcd_raw);
-      // debugJParsedConfig(jcd);
-
-      //unterbrechungen sind nicht möglich, nur ganz aus- oder einfahren !!
-      //TZ1
-      if (digitalRead(TAUCHZELLENSTOP1) == 0){
+  //unterbrechungen sind nicht möglich, nur ganz aus- oder einfahren !!
+  //TZ1
+  if (digitalRead(TAUCHZELLENSTOP1) == 0){
         tauchzellenstopp1 = true;
         tauchzelle1ausgefahren = true;
         Serial.print(" Endsensor1:stop");
@@ -284,12 +253,47 @@ void loop() {
 
     analogWrite(TAUCHZELLEENA, TAUCHZELLENGESCHWINDIGKEIT);
     analogWrite(TAUCHZELLEENB, TAUCHZELLENGESCHWINDIGKEIT);
+}
+
+void loop() {  
+
+  if (mySwitch.available()) {  // Wenn ein Code Empfangen wird...
+    unsigned long code = mySwitch.getReceivedValue();
+    long decoded = decode(code);  
+
+    bool legit = checkPrefix(code, decoded);
+    if (legit) {
+      if (code == 1) {
+        digitalWrite(pin1, HIGH);
+      }
+      //Steuerung Tauchzellen
+      schalter1 = CHECK_BIT(code, 0);
+      schalter2 = CHECK_BIT(code, 1);
+      schalter3 = CHECK_BIT(code, 2);
+
+      //Steuerung Seitentrieb
+      long jcd_raw = bitrange(code, 8, 3);
+
+
+      Serial.print("Receiving: ");
+      Serial.print("S1:");
+      Serial.print(schalter1);
+      Serial.print(" | S2:");
+      Serial.print(schalter2);
+   
+      // Serial.print(" | Joystick raw:");
+      // showJConfig(jcd_raw);
+      // debug(mySwitch);
+
+      // JCD jcd = readJSData(jcd_raw);
+      // debugJParsedConfig(jcd);      
     }
     else {
       Serial.print("Noise: ");
       Serial.println(code);
     }
-
     mySwitch.resetAvailable();
   }
+
+  handleTZ();
 }
