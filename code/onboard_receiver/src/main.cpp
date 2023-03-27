@@ -304,6 +304,7 @@ void loop() {
   schalter2 = schalter1; 
   Serial.print("PIN SIGNAL: ");
   Serial.print(schalter1);
+  Serial.println("");
   tauchzelle1ausgefahren = true;
 
   if (!run){
