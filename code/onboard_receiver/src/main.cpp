@@ -166,23 +166,27 @@ void handleTZ(){
     stopTZ1();
   }
   else {
-    if (schalter1) {     
-      //tauchzelle ist eingefahren
-      if (!tauchzelle1faertaus){
-        //start timer ausfahrt
-        TZ1AUSFAHRTTS = millis();
-      }
-      if ((millis() - TZ1AUSFAHRTTS) >= AUSFAHRTZEIT1){
-          stopTZ1();
-          tauchzelle1ausgefahren = true;
-      }
-      else {
-        tauchzelle1ausgefahren = false;
-        turnTZ1l();
-      }        
+    if (schalter1) {    
+      //tauchzelle fährt nicht gerade
+      if (!tauchzelle1faertein){
+        //tauchzelle ist eingefahren
+        if (!tauchzelle1faertaus){
+          //start timer ausfahrt
+          TZ1AUSFAHRTTS = millis();
+        }
+        if ((millis() - TZ1AUSFAHRTTS) >= AUSFAHRTZEIT1){
+            stopTZ1();
+            tauchzelle1ausgefahren = true;
+        }
+        else {
+          tauchzelle1ausgefahren = false;
+          turnTZ1l();
+        }        
+      }       
     }
     //schalter aus
     else {
+      //nur wenn ganz ausgefahren, wieder einfahren
       if (tauchzelle1ausgefahren){
         if (!tauchzelle1faertein){
           //start timer einfahrt
@@ -204,29 +208,33 @@ void handleTZ(){
   }
 
   //TZ2
-  if (digitalRead(TAUCHZELLENSTOP2) == 0){
-    tauchzellewausgefahren = true;
+  if (digitalRead(TAUCHZELLENSTOP) == 0){
+    tauchzelle2ausgefahren = true;
     Serial.print(" Endsensor2:stop");
     stopTZ2();
   }
   else {
-    if (schalter2) {     
-      //tauchzelle ist eingefahren
-      if (!tauchzelle2faertaus){
-        //start timer ausfahrt
-        TZ2AUSFAHRTTS = millis();
-      }
-      if ((millis() - TZ2AUSFAHRTTS) >= AUSFAHRTZEIT2){
-          stopTZ2();
-          tauchzelle2ausgefahren = true;
-      }
-      else {
-        tauchzelle2ausgefahren = false;
-        turnTZ2l();
-      }        
+    if (schalter2) {    
+      //tauchzelle fährt nicht gerade
+      if (!tauchzelle2faertein){
+        //tauchzelle ist eingefahren
+        if (!tauchzelle2faertaus){
+          //start timer ausfahrt
+          TZ2AUSFAHRTTS = millis();
+        }
+        if ((millis() - TZ2AUSFAHRTTS) >= AUSFAHRTZEIT2){
+            stopTZ2();
+            tauchzelle2ausgefahren = true;
+        }
+        else {
+          tauchzelle2ausgefahren = false;
+          turnTZ2l();
+        }        
+      }       
     }
     //schalter aus
     else {
+      //nur wenn ganz ausgefahren, wieder einfahren
       if (tauchzelle2ausgefahren){
         if (!tauchzelle2faertein){
           //start timer einfahrt
@@ -270,21 +278,14 @@ void loop() {
       schalter3 = CHECK_BIT(code, 2);
 
       //Steuerung Seitentrieb
-      long jcd_raw = bitrange(code, 8, 3);
-
+      // long jcd_raw = bitrange(code, 8, 3);
 
       Serial.print("Receiving: ");
       Serial.print("S1:");
       Serial.print(schalter1);
       Serial.print(" | S2:");
       Serial.print(schalter2);
-   
-      // Serial.print(" | Joystick raw:");
-      // showJConfig(jcd_raw);
-      // debug(mySwitch);
 
-      // JCD jcd = readJSData(jcd_raw);
-      // debugJParsedConfig(jcd);      
     }
     else {
       Serial.print("Noise: ");
