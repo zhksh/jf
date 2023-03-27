@@ -49,9 +49,9 @@ class SubUI(QWidget):
 
         self.setFixedSize(700, 480)
         font_val = self.font()
-        font_val.setPointSize(50)
+        font_val.setPointSize(30)
         font_label = self.font()
-        font_label.setPointSize(30)      
+        font_label.setPointSize(15)      
 
         positions = [(i, j) for i in range(2) for j in range(2)]
         for position, (lname,name) in zip(positions, self.sensor_names):
