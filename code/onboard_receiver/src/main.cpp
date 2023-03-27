@@ -92,6 +92,7 @@ bool checkPrefix(unsigned long original_msg, long  decoded) {
   return passed;
 }
 
+
 void turnTZ1r(){
     digitalWrite(TAUCHZELLE10, LOW);
     digitalWrite(TAUCHZELLE11, HIGH);
