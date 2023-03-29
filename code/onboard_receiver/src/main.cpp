@@ -9,57 +9,40 @@
 
 
 // Tauchzelle 1
-#define TAUCHZELLEENA 5
-#define TAUCHZELLE10 6
-#define TAUCHZELLE11 7
-#define TAUCHZELLENSTOP1 12
+#define TZ1_PIN_SPEED 5
+#define TZ1_PIN0 6
+#define TZ1_PIN1 7
+#define TZ1_PIN_STOP 12
 
 
 // Tauchzelle 2
-#define TAUCHZELLEIN3 8
-#define TAUCHZELLEIN4 9
-#define TAUCHZELLEENB 10
-#define TAUCHZELLENSTOP2 11
+#define TZ2_PIN0 8
+#define TZ2_PIN1 9
+#define TZ2_PIN_SPEED 10
+#define TZ2_PIN_STOP 11
 
-#define TAUCHZELLENGESCHWINDIGKEIT 150
+#define TZ_SPEED 150
 
 #define CHECK_BIT(var,pos) ((var) & (1<<(pos))) != 0
 
 
-bool tauchzellenstopp1 = false;
-bool tauchzellenstopp2 = false;
+bool tz1_ausgefahren = false;
+unsigned long tz1_maxeinfahrt = 15000;
+unsigned long tz1_maxausfahrt = 4000;
 
-bool tauchzelle1ausgefahren = false;
-bool tauchzelle2ausgefahren = false;
-
-bool tauchzelle1faertaus = false;
-bool tauchzelle1faertein = false;
-
-bool tauchzelle2faertaus = false;
-bool tauchzelle2faertein = false;
+bool tz2_ausgefahren = false;
+unsigned long tz2_maxeinfahrt = 15000;
+unsigned long tz2_maxausfahrt = 4000;
 
 
-unsigned long TZ2AUSFAHRTTS = 0; 
-unsigned long TZ1AUSFAHRTTS = 0; 
+// int TEST_PIN = 2;
+// int pin1;
 
-unsigned long EINFAHRZEIT = 15000;
-unsigned long AUSFAHRTZEIT2 = 7500;
-unsigned long AUSFAHRTZEIT1 = 7500;
-
-
-
-unsigned long EINFAHRTTS1 = 0;
-unsigned long EINFAHRTTS2 = 0;
-
-int pin = 1;
-int pin1;
+boolean run = false;
 
 int baud = 9600;
-int schalter1;
-int schalter2;
-int schalter3;
-int joystick0;
-int joystick1;
+int schalter1 = 0;
+int schalter2 = 0;
 
 const int TPVO = 30;
 const int TPVU = 32;
@@ -71,225 +54,95 @@ const int TPHU = 41;
 const int TPHL = 45;
 const int TPHR = 44;
 
+
+
+
+
+
 RCSwitch mySwitch = RCSwitch();
 
+Joystick j0 = Joystick("J0");
+Joystick j1 = Joystick("J1");
+
+TZ tz0 = {tz1_maxausfahrt, 
+          tz1_maxeinfahrt, 
+          TZ1_PIN0, 
+          TZ1_PIN1, 
+          TZ1_PIN_STOP, 
+          TZ1_PIN_SPEED,
+          "TZ1"};
+
+TZ tz1 = {tz2_maxausfahrt,
+          tz2_maxeinfahrt,
+          TZ2_PIN0,
+          TZ2_PIN1,
+          TZ2_PIN_STOP,
+          TZ2_PIN_SPEED,
+          "TZ2"
+     };
+     
+tz1.setSpeed(TZ1_PIN_SPEED);
+tz2.setSpeed(TZ2_PIN_SPEED);
+
+
+
 void setup() {
-  pinMode(TAUCHZELLENSTOP1, INPUT_PULLUP);
-  pinMode(TAUCHZELLENSTOP2, INPUT_PULLUP);
+  pinMode(TZ1_PIN_STOP, INPUT_PULLUP);
+  pinMode(TZ2_PIN_STOP, INPUT_PULLUP);
 
   Serial.begin(baud);
   Serial.println("Receiver setup");
   mySwitch.enableReceive(RECEIVER_PIN);
-}
-
-long decode(long msg) {
-  return msg & PREFIX_MASK;
-}
-
-bool checkPrefix(unsigned long original_msg, long  decoded) {
-  bool passed = (decoded | PREFIX) == original_msg;
-
-  return passed;
+  // pinMode(TEST_PIN, INPUT);
 }
 
 
-void turnTZ1r(){
-    digitalWrite(TAUCHZELLE10, LOW);
-    digitalWrite(TAUCHZELLE11, HIGH);
-    tauchzelle1faertein = true;
-    Serial.print(" TZ1:einfahren");
-}
-
-void turnTZ1l(){
-    digitalWrite(TAUCHZELLE10, HIGH);
-    digitalWrite(TAUCHZELLE11, LOW);
-    tauchzelle1faertaus = true;
-    Serial.print(" TZ1:ausfahren");
-}
-
-void stopTZ1(){
-   digitalWrite(TAUCHZELLE10, LOW);
-   digitalWrite(TAUCHZELLE11, LOW);
-   tauchzelle1faertaus = false;
-   tauchzelle1faertein = false;
-   TZ1AUSFAHRTTS = 0;
-   EINFAHRTTS1 = 0;
-   Serial.print(" TZ1:stop");
-
-}
-
-// Tauchzelle 2
-void turnTZ2r(){
-    digitalWrite(TAUCHZELLEIN3, LOW);
-    digitalWrite(TAUCHZELLEIN4, HIGH);
-    tauchzelle2faertein = true;
-    Serial.print(" TZ2:einfahren");
-
-}
-
-void turnTZ2l(){
-    digitalWrite(TAUCHZELLEIN3, HIGH);
-    digitalWrite(TAUCHZELLEIN4, LOW);
-    tauchzelle2faertaus = true;
-    Serial.print(" TZ2:ausfahren");
-}
-
-void stopTZ2(){
-   digitalWrite(TAUCHZELLEIN3, LOW);
-   digitalWrite(TAUCHZELLEIN4, LOW);
-   tauchzelle2faertaus = false;
-   tauchzelle2faertein = false;
-   TZ2AUSFAHRTTS = 0;
-   EINFAHRTTS2 = 0;
-
-   Serial.print(" TZ2:stop");
-}
-
-
-void loop() {
+void loop() { 
   if (mySwitch.available()) {  // Wenn ein Code Empfangen wird...
     unsigned long code = mySwitch.getReceivedValue();
-    long decoded = decode(code);  
+    long decoded = decode(code, PREFIX_MASK);  
 
-    bool legit = checkPrefix(code, decoded);
-    if (legit) {
-      if (code == 1) {
-        digitalWrite(pin1, HIGH);
-      }
+    // bool legit = checkPrefix(code, decoded);
+    if (islegit(code, decoded, PREFIX)) {
+      // if (code == 1) {
+      //   digitalWrite(pin1, HIGH);
+      // }
       //Steuerung Tauchzellen
       schalter1 = CHECK_BIT(code, 0);
       schalter2 = CHECK_BIT(code, 1);
-      schalter3 = CHECK_BIT(code, 2);
+      // schalter3 = CHECK_BIT(code, 2);
 
       //Steuerung Seitentrieb
       long jcd_raw = bitrange(code, 8, 3);
-
+      j0.parse(bitrange(jcd_raw, 4, 0));
+      j1.parse(bitrange(jcd_raw, 4, 4));
 
       Serial.print("Receiving: ");
       Serial.print("S1:");
       Serial.print(schalter1);
       Serial.print(" | S2:");
       Serial.print(schalter2);
-   
-      // Serial.print(" | Joystick raw:");
-      // showJConfig(jcd_raw);
-      // debug(mySwitch);
-
-      // JCD jcd = readJSData(jcd_raw);
-      // debugJParsedConfig(jcd);
-
-      //unterbrechungen sind nicht möglich, nur ganz aus- oder einfahren !!
-      //TZ1
-      if (digitalRead(TAUCHZELLENSTOP1) == 0){
-        tauchzellenstopp1 = true;
-        tauchzelle1ausgefahren = true;
-        Serial.print(" Endsensor1:stop");
-      }
-      else {
-        tauchzellenstopp1 = false;
-      }
-      
-      if (schalter1) {
-        //endschalter ein
-        if (tauchzellenstopp1) {
-          stopTZ1();
-        }
-        //ausfahren
-        else {
-          //tauchzelle ist eingefahren
-          if (!tauchzelle1faertaus){
-            TZ1AUSFAHRTTS = millis();
-          }
-          if (millis() - TZ1AUSFAHRTTS > AUSFAHRTZEIT1){
-              stopTZ1();
-              tauchzelle1ausgefahren = true;
-          }
-          else {
-            tauchzelle1ausgefahren = false;
-            turnTZ1l();
-          }                  
-        }
-      }
-    //schalter aus
-      else {
-        //einfahren geht nur nachdem komplett ausgehfahren wurde
-        if (tauchzelle1ausgefahren){
-          if (!tauchzelle1faertein){
-            EINFAHRTTS1 = millis();
-          }
-          if (millis() - EINFAHRTTS1 > EINFAHRZEIT){
-            //genug eingefahren, stop
-            Serial.print(" TZ1:eingefahren");
-            stopTZ1();
-            tauchzelle1ausgefahren = false;  
-          }
-          else {
-             //einfahren
-            turnTZ1r();
-          }
-        }
-      }
-
-      //TZ2
-      if (digitalRead(TAUCHZELLENSTOP2) == 0){
-        tauchzellenstopp2 = true;
-        tauchzelle2ausgefahren = true;
-        Serial.print(" Endsensor2:stop");
-      }
-      else {
-        tauchzellenstopp2 = false;
-      }
-      
-      if (schalter2) {
-        //endschalter ein
-        if (tauchzellenstopp2) {
-          stopTZ2();
-        }
-        //ausfahren
-        else {
-          //tauchzelle ist eingefahren
-          if (!tauchzelle2faertaus){
-            TZ2AUSFAHRTTS = millis();
-          }
-          if (millis() - TZ2AUSFAHRTTS > AUSFAHRTZEIT2){
-              stopTZ2();
-              tauchzelle2ausgefahren = true;
-          }
-          else {
-            tauchzelle2ausgefahren = false;
-            turnTZ2l();
-          }                  
-        }
-      }
-    //schalter aus
-      else {
-        //einfahren geht nur nachdem komplett ausgehfahren wurde
-        if (tauchzelle2ausgefahren){
-          if (!tauchzelle2faertein){
-            EINFAHRTTS2 = millis();
-          }
-          if (millis() - EINFAHRTTS2 > EINFAHRZEIT){
-            //genug eingefahren, stop
-            Serial.print(" TZ2:eingefahren");
-            stopTZ2();
-            tauchzelle2ausgefahren = false;  
-          }
-          else {
-             //einfahren
-            turnTZ2r();
-          }
-        }
-      }
-      Serial.println("#################"); 
-
-    analogWrite(TAUCHZELLEENA, TAUCHZELLENGESCHWINDIGKEIT);
-    analogWrite(TAUCHZELLEENB, TAUCHZELLENGESCHWINDIGKEIT);
     }
     else {
       Serial.print("Noise: ");
       Serial.println(code);
     }
-
     mySwitch.resetAvailable();
   }
+
+  // schalter1 = digitalRead(TEST_PIN);
+  // schalter2 = schalter1; 
+  // Serial.print("PIN SIGNAL: ");
+  // Serial.print(schalter1);
+  // Serial.println("");
+
+  run |= schalter1;
+  if (run){
+    tz1.update(schalter1);
+    tz2.update(schalter2);
+
+   
+  }
+
+  
 }
