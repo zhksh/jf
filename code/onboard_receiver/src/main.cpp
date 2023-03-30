@@ -265,7 +265,7 @@ void handleTZ(){
 
 void loop() {  
 
-  if (mySwitch.available()) {  // Wenn ein Code Empfangen wird...
+  if (mySwitch.available()) {  // Incoming signal
     unsigned long code = mySwitch.getReceivedValue();
     long decoded = decode(code);  
 

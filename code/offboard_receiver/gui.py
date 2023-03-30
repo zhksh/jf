@@ -44,7 +44,7 @@ class SubUI(QWidget):
         # grid.setRowStretch(0, 2) 
         grid.setColumnStretch(0,2) 
         self.setLayout(grid)
-        # self.connect()
+        self.connect()
         self.sensor_map = {}
 
         self.setFixedSize(700, 480)
