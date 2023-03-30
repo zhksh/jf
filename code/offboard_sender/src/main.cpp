@@ -127,6 +127,10 @@ void setup() {
   pinMode(JOYSTICK1Y, INPUT);
 }
 
+
+Joystick j1 = Joystick();
+Joystick j2 = Joystick();
+
 void loop() {
   long schalter1 = digitalRead(SWITCH1);
   long schalter2 = digitalRead(SWITCH2);
