@@ -11,14 +11,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define MSG_LENGTH 32
-
-// #define TEMP0_POS 0
-// #define TEMP1_POS 8
-// #define TB_VAL_POS 16
-
-
-
 // PINS
 #define TRANSMITTER_PIN 11
 
@@ -29,7 +21,7 @@
 #define TESENSOR A0
 
 
-RCSwitch mySwitch = RCSwitch();
+RCSwitch sender = RCSwitch();
 
 OneWire temp0Driver(TEMPSENSOR0_PIN);
 DallasTemperature temp0Sensor(&temp0Driver);
@@ -49,7 +41,7 @@ void transmit(long data) {
   Serial.print(msg);
   Serial.print(", encoded:");
   Serial.println(msg);
-  mySwitch.send(msg , MSG_LENGTH);
+  sender.send(msg , MSG_LENGTH);
 }
 
 
@@ -59,8 +51,8 @@ void setup() {
   temp0Sensor.begin();
   temp1Sensor.begin();
 
-  mySwitch.enableTransmit(TRANSMITTER_PIN);
-  mySwitch.setRepeatTransmit(SENSOR_REPAT_TRANSMISSION);
+  sender.enableTransmit(TRANSMITTER_PIN);
+  sender.setRepeatTransmit(SENSOR_REPEAT_TRANSMISSION);
 }
 
 void printToSerial(float tb, float temp0, float temp1, float aux){
@@ -118,15 +110,15 @@ void loop() {
   long val1_cut = val1 *10;
 
   Serial.print("tbval:");
-  Serial.println(dec2bin(tbval, MSG_LENGTH));
+  Serial.println(dec2binWzerofill(tbval, MSG_LENGTH));
   Serial.print("temp0:");
   Serial.println(val0_cut);
   Serial.println(val0);
-  Serial.println(dec2bin(val0_cut, MSG_LENGTH));
+  Serial.println(dec2binWzerofill(val0_cut, MSG_LENGTH));
   Serial.print("temp1:");
   Serial.println(val1_cut);
   Serial.println(val1);
-  Serial.println(dec2bin(val1_cut, MSG_LENGTH));
+  Serial.println(dec2binWzerofill(val1_cut, MSG_LENGTH));
 
   long raw = (long) tbval << TURB_POS;
   raw |=  val1_cut << TEMP1_POS; 
