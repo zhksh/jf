@@ -99,16 +99,13 @@ void loop() {
 
     // bool legit = checkPrefix(code, decoded);
     if (islegit(data, CONTROL_RC_PREFIX, CONTROL_RC_PREFIX_LEN, CONTROL_RC_PREFIX_POS)) {
-      // if (code == 1) {
-      //   digitalWrite(pin1, HIGH);
-      // }
       //Steuerung Tauchzellen
       schalter1 = CHECK_BIT(data, 0);
       schalter2 = CHECK_BIT(data, 1);
       // schalter3 = CHECK_BIT(code, 2);
 
       //Steuerung Seitentrieb
-      long jcd_raw = BIT_RANGE(data, 8, 3);
+      long jcd_raw = BIT_RANGE(data, 8, CONTROL_J_POS);
       j0.parse(BIT_RANGE(jcd_raw, 4, 0));
       j1.parse(BIT_RANGE(jcd_raw, 4, 4));
 

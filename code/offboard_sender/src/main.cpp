@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <util.h>
 #include <vals.h>
+#include <debug.h>
+
 
 
 // PINS
@@ -69,9 +71,6 @@ void setup() {
   pinMode(JOYSTICK1Y, INPUT);
 }
 
-
-Joystick j1 = Joystick();
-Joystick j2 = Joystick();
 
 void loop() {
   long schalter1 = digitalRead(SWITCH1);
