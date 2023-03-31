@@ -2,9 +2,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <util.h>
+#include <vals.h>
+#include <debug.h>
 
-#define PREFIX 0xff000000
-#define MSG_LENGTH 32
 
 
 // PINS
@@ -19,17 +20,10 @@
 
 
 RCSwitch mySwitch = RCSwitch();
-long n;
 
-unsigned long encode(long code) {
-  long value = code | PREFIX;
-  return value;
-  // return code;
-}
+void transmit(long data) {
 
-void transmit(long code) {
-
-  long msg = encode(code);
+  long msg = addprefix(data, CONTROL_RC_PREFIX, CONTROL_RC_PREFIX_POS);
   // Serial.print("code:");
   // Serial.print(code);
   // Serial.print(", encoded:");
@@ -62,59 +56,9 @@ int joystick2data(long j0x, long j0y, long j1x, long j1y){
   return data;
 }
 
-void showJConfig(int data){
-  String r = "rechts";
-  String l = "links";
-  String h = "hoch";
-  String ru = "runter";
-
-
-  String n = "neutral";
-
-  Serial.print("J0 ");
-
-  Serial.print(" x: ");
-  if ((data & 0b01000000) >> 6) Serial.print(n);
-  else {
-      if ((data & 0b10000000)) Serial.print(r);
-      else Serial.print(l);
-
-  }
-  Serial.print(" y: ");
-  if ((data & 0b00010000) >> 4) Serial.print(n);
-  else {
-    if ((data & 0b00100000)) Serial.print(h);
-    else Serial.print(ru);
-
-  }
-  
-  Serial.println("");
-  Serial.print("J1 ");
-
-  Serial.print(" x: ");
-  if ((data & 0b00000100) >> 2) Serial.print(n);
-  else {
-      if ((data & 0b00001000)) Serial.print(r);
-      else Serial.print(l);
-
-  }
-  Serial.print(" y: ");
-  if ((data & 0b00000001)) Serial.print(n);
-  else {
-    if ((data & 0b00000010)) Serial.print(h);
-    else Serial.print(ru);
-
-  }
-      Serial.println("");
-
-    // Serial.print("data:");
-    // Serial.print(data);
-    Serial.println("");
-}
-
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(BAUD);
   Serial.println("Sender setup");
   mySwitch.enableTransmit(TRANSMITTER_PIN);
 
@@ -128,9 +72,6 @@ void setup() {
 }
 
 
-Joystick j1 = Joystick();
-Joystick j2 = Joystick();
-
 void loop() {
   long schalter1 = digitalRead(SWITCH1);
   long schalter2 = digitalRead(SWITCH2);
@@ -139,18 +80,18 @@ void loop() {
   long joystick0X = analogRead(JOYSTICK0X);
   long joystick1Y = analogRead(JOYSTICK1Y);
   long joystick1X = analogRead(JOYSTICK1X);
-  // n = schalter1 + 2 * schalter2 + 4 * schalter3 + 8 * joystick0Y + 8192 * joystick0X;
+
   //one byte long
   long jdata_encoded = joystick2data(joystick0X, joystick0Y, joystick1X, joystick1Y);
 
   long data;
-  data |=  schalter1 << 0; 
-  data |=  schalter2 << 1; 
-  data |=  schalter3 << 2; 
+  data |=  schalter1 << CONTROL_S1_POS; 
+  data |=  schalter2 << CONTROL_S2_POS; 
+  data |=  schalter3 << CONTROL_S3_POS; 
   // data |=  joystick0X << 3; 
   // data |=  joystick0Y << 13; 
 
-  data |= jdata_encoded << 3;
+  data |= jdata_encoded << CONTROL_J_POS;
 
 
   Serial.print("Sending: S1:");

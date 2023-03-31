@@ -1,13 +1,23 @@
 #include <RCSwitch.h>
 
-#define CHECK_BIT(var,pos) ((var) & (1<<(pos))) != 0
-#define BIT_RANGE(var, len, pos) (var >> pos) & ((1 << len)-1)
+#define CHECK_BIT(var,pos) (((var) & (1<<(pos))) != 0)
+#define BIT_RANGE(var, len, pos) ((var >> pos) & ((1 << len)-1))
 
 long bitrange(long msg, int len, int pos){
   long mask = (1 << len)-1;
   // Serial.println(mask);
   long result = msg >> pos;
   return result & mask;
+}
+
+long islegit(long data, long prefix, int prefix_pos, int prefix_len) {
+  return BIT_RANGE(data, prefix_len, prefix_pos) == prefix;
+}
+
+unsigned long addprefix(long data, int prefix, int prefix_pos) {
+  unsigned long p = prefix << prefix_pos;
+
+  return  data | p;
 }
 
 struct XAxis {
@@ -54,13 +64,6 @@ class Joystick {
 };
 
 
-long decode(long msg, long prefix_mask) {
-  return msg & prefix_mask;
-}
-
-bool islegit(unsigned long original_msg, unsigned long  decoded, long prefix) {
-  return (decoded | prefix) == original_msg;
-}
 
 class TZ {
     public: 
@@ -174,47 +177,3 @@ class TZ {
       }
     }
 };
-
-// void debugJParsedConfig(JCD jcd){
-//   String r = "rechts";
-//   String l = "links";
-//   String h = "hoch";
-//   String ru = "runter";
-//   String n = "neutral";
-//   Serial.print("J0 ");
-//   Serial.print("x: ");
-//   if (jcd.j0.x.none){
-//     Serial.print(n); 
-//   } 
-//   else {
-//       if (jcd.j0.x.right) Serial.print(r);
-//       else if (jcd.j0.x.left) Serial.print(l);
-//   }
-//   Serial.print(" y: ");
-//   if (jcd.j0.y.none) Serial.print(n);
-//   else {
-//     if (jcd.j0.y.up) Serial.print(h);
-//     else if(jcd.j0.y.down) Serial.print(ru);
-//   }
-  
-//   Serial.println("");
-//   Serial.print("J1:");
-//   Serial.print(" x: ");
-//   if (jcd.j1.x.none) Serial.print(n);
-//   else {
-//       if (jcd.j1.x.right) Serial.print(r);
-//       else if (jcd.j1.x.left) Serial.print(l);
-
-//   }
-//   Serial.print(" y: ");
-//   if (jcd.j1.y.none) Serial.print(n);
-//   else {
-//     if (jcd.j1.y.up) Serial.print(h);
-//     else if (jcd.j1.y.down) Serial.print(ru);
-
-//   }
-//       Serial.println("");
-//     // Serial.print("data:");
-//     // Serial.print(data);
-//     // Serial.println("");
-// }

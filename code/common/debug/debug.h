@@ -3,7 +3,6 @@
 static const char* bin2tristate(const char* bin);
 static char * dec2binWzerofill(unsigned long Dec, unsigned int bitLength);
 
-
 void output(unsigned long decimal, unsigned int length, unsigned int delay, unsigned int* raw, unsigned int protocol) {
 
   const char* b = dec2binWzerofill(decimal, length);
@@ -20,6 +19,14 @@ void output(unsigned long decimal, unsigned int length, unsigned int delay, unsi
   Serial.print(" microseconds");
   Serial.print(" Protocol: ");
   Serial.println(protocol);
+  
+  // Serial.print("Raw data: ");
+  // for (unsigned int i=0; i<= length*2; i++) {
+  //   Serial.print(raw[i]);
+  //   Serial.print(",");
+  // }
+  Serial.println();
+  Serial.println();
 }
 
 static const char* bin2tristate(const char* bin) {
@@ -63,6 +70,7 @@ static char * dec2binWzerofill(unsigned long Dec, unsigned int bitLength) {
   
   return bin;
 }
+
 
 void debug(RCSwitch receiver){
   output(receiver.getReceivedValue(), receiver.getReceivedBitlength(), receiver.getReceivedDelay(), receiver.getReceivedRawdata(),receiver.getReceivedProtocol());
@@ -115,3 +123,47 @@ void showJConfig(int data){
     // Serial.println("");
 }
 
+
+// void debugJParsedConfig(JCD jcd){
+//   String r = "rechts";
+//   String l = "links";
+//   String h = "hoch";
+//   String ru = "runter";
+//   String n = "neutral";
+//   Serial.print("J0 ");
+//   Serial.print("x: ");
+//   if (jcd.j0.x.none){
+//     Serial.print(n); 
+//   } 
+//   else {
+//       if (jcd.j0.x.right) Serial.print(r);
+//       else if (jcd.j0.x.left) Serial.print(l);
+//   }
+//   Serial.print(" y: ");
+//   if (jcd.j0.y.none) Serial.print(n);
+//   else {
+//     if (jcd.j0.y.up) Serial.print(h);
+//     else if(jcd.j0.y.down) Serial.print(ru);
+//   }
+  
+//   Serial.println("");
+//   Serial.print("J1:");
+//   Serial.print(" x: ");
+//   if (jcd.j1.x.none) Serial.print(n);
+//   else {
+//       if (jcd.j1.x.right) Serial.print(r);
+//       else if (jcd.j1.x.left) Serial.print(l);
+
+//   }
+//   Serial.print(" y: ");
+//   if (jcd.j1.y.none) Serial.print(n);
+//   else {
+//     if (jcd.j1.y.up) Serial.print(h);
+//     else if (jcd.j1.y.down) Serial.print(ru);
+
+//   }
+//       Serial.println("");
+//     // Serial.print("data:");
+//     // Serial.print(data);
+//     // Serial.println("");
+// }
