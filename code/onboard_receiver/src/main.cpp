@@ -37,7 +37,6 @@ unsigned long tz2_maxausfahrt = 4000;
 
 boolean run = false;
 
-int baud = 9600;
 int schalter1 = 0;
 int schalter2 = 0;
 
@@ -80,7 +79,7 @@ void setup() {
   pinMode(TZ1_PIN_STOP, INPUT_PULLUP);
   pinMode(TZ2_PIN_STOP, INPUT_PULLUP);
 
-  Serial.begin(baud);
+  Serial.begin(BAUD);
   Serial.println("Receiver setup");
   receiver.enableReceive(INTERRUPT_PIN);
 
