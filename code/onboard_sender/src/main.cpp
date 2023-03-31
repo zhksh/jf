@@ -3,17 +3,19 @@
 #include <RCSwitch.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
+#include <util.h>
+#include <debug.h>
+#include <vals.h>
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-#define PREFIX 0xd0000000
 #define MSG_LENGTH 32
 
-#define TEMP0_POS 0
-#define TEMP1_POS 8
-#define TB_VAL_POS 16
+// #define TEMP0_POS 0
+// #define TEMP1_POS 8
+// #define TB_VAL_POS 16
 
 
 
@@ -37,18 +39,14 @@ DallasTemperature temp1Sensor(&temp1Driver);
 
 long n;
 
-unsigned long encode(long code) {
-  long value = code | PREFIX;
-  return value;
-  // return code;
-}
 
 
-void transmit(long code) {
 
-  long msg = encode(code);
+void transmit(long data) {
+
+  long msg = addprefix(data, CONTROL_RC_PREFIX, CONTROL_RC_PREFIX_POS);
   Serial.print("raw:");
-  Serial.print(code);
+  Serial.print(msg);
   Serial.print(", encoded:");
   Serial.println(msg);
   mySwitch.send(msg , MSG_LENGTH);
@@ -56,16 +54,13 @@ void transmit(long code) {
 
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(BAUD);
   // Serial.println("Sender setup");
   temp0Sensor.begin();
   temp1Sensor.begin();
 
   mySwitch.enableTransmit(TRANSMITTER_PIN);
-  // mySwitch.setProtocol(1);
-
- // Optional set number of transmission repetitions.
-  mySwitch.setRepeatTransmit(8);
+  mySwitch.setRepeatTransmit(SENSOR_REPAT_TRANSMISSION);
 }
 
 void printToSerial(float tb, float temp0, float temp1, float aux){
@@ -92,26 +87,6 @@ void printToSerial(float tb, float temp0, float temp1, float aux){
   Serial.println("");
 }
 
-static char * dec2binWzerofill(unsigned long Dec, unsigned int bitLength) {
-  static char bin[64]; 
-  unsigned int i=0;
-
-  while (Dec > 0) {
-    bin[32+i++] = ((Dec & 1) > 0) ? '1' : '0';
-    Dec = Dec >> 1;
-  }
-
-  for (unsigned int j = 0; j< bitLength; j++) {
-    if (j >= bitLength - i) {
-      bin[j] = bin[ 31 + i - (j - (bitLength - i)) ];
-    } else {
-      bin[j] = '0';
-    }
-  }
-  bin[bitLength] = '\0';
-  
-  return bin;
-}
 
 float requestTemp(DallasTemperature sensor){
     float val;
@@ -143,24 +118,24 @@ void loop() {
   long val1_cut = val1 *10;
 
   Serial.print("tbval:");
-  Serial.println(dec2binWzerofill(tbval, MSG_LENGTH));
+  Serial.println(dec2bin(tbval, MSG_LENGTH));
   Serial.print("temp0:");
   Serial.println(val0_cut);
   Serial.println(val0);
-  Serial.println(dec2binWzerofill(val0_cut, MSG_LENGTH));
+  Serial.println(dec2bin(val0_cut, MSG_LENGTH));
   Serial.print("temp1:");
   Serial.println(val1_cut);
   Serial.println(val1);
-  Serial.println(dec2binWzerofill(val1_cut, MSG_LENGTH));
+  Serial.println(dec2bin(val1_cut, MSG_LENGTH));
 
-  long raw = (long) tbval << TB_VAL_POS;
+  long raw = (long) tbval << TURB_POS;
   raw |=  val1_cut << TEMP1_POS; 
   raw |=  val0_cut << TEMP0_POS; 
 
   // mySwitch.setProtocol(n%5);
 
   transmit(raw);  
-  delay(200);
+  delay(SENSOR_SEND_FRQ);
   
 }
 

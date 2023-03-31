@@ -3,7 +3,6 @@
 static const char* bin2tristate(const char* bin);
 static char * dec2binWzerofill(unsigned long Dec, unsigned int bitLength);
 
-
 void output(unsigned long decimal, unsigned int length, unsigned int delay, unsigned int* raw, unsigned int protocol) {
 
   const char* b = dec2binWzerofill(decimal, length);
@@ -20,6 +19,14 @@ void output(unsigned long decimal, unsigned int length, unsigned int delay, unsi
   Serial.print(" microseconds");
   Serial.print(" Protocol: ");
   Serial.println(protocol);
+  
+  // Serial.print("Raw data: ");
+  // for (unsigned int i=0; i<= length*2; i++) {
+  //   Serial.print(raw[i]);
+  //   Serial.print(",");
+  // }
+  Serial.println();
+  Serial.println();
 }
 
 static const char* bin2tristate(const char* bin) {
@@ -68,6 +75,26 @@ void debug(RCSwitch receiver){
   output(receiver.getReceivedValue(), receiver.getReceivedBitlength(), receiver.getReceivedDelay(), receiver.getReceivedRawdata(),receiver.getReceivedProtocol());
 }
 
+static char * dec2bin(unsigned long Dec, unsigned int bitLength) {
+  static char bin[64]; 
+  unsigned int i=0;
+
+  while (Dec > 0) {
+    bin[32+i++] = ((Dec & 1) > 0) ? '1' : '0';
+    Dec = Dec >> 1;
+  }
+
+  for (unsigned int j = 0; j< bitLength; j++) {
+    if (j >= bitLength - i) {
+      bin[j] = bin[ 31 + i - (j - (bitLength - i)) ];
+    } else {
+      bin[j] = '0';
+    }
+  }
+  bin[bitLength] = '\0';
+  
+  return bin;
+}
 
 void showJConfig(int data){
   String r = "rechts";
@@ -114,4 +141,3 @@ void showJConfig(int data){
     // Serial.print(data);
     // Serial.println("");
 }
-

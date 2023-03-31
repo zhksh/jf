@@ -2,10 +2,11 @@
 #include <RCSwitch.h>
 #include <debug.h>
 #include <util.h>
+#include <vals.h>
+
 
 #define RECEIVER_PIN 0     // entspircht pin 2
-#define PREFIX 0xff000000  //prefix für empfang der nachricht
-#define PREFIX_MASK 0x00ffffff
+
 
 
 // Tauchzelle 1
@@ -23,7 +24,6 @@
 
 #define TZ_SPEED 150
 
-#define CHECK_BIT(var,pos) ((var) & (1<<(pos))) != 0
 
 
 bool tz1_ausgefahren = false;
@@ -55,7 +55,7 @@ const int TPHL = 45;
 const int TPHR = 44;
 
 
-RCSwitch mySwitch = RCSwitch();
+RCSwitch receiver = RCSwitch();
 
 Joystick j0 = Joystick("J0");
 Joystick j1 = Joystick("J1");
@@ -78,10 +78,6 @@ TZ tz1 = {tz2_maxausfahrt,
           "TZ2"
      };
      
-tz0.setSpeed(TZ1_PIN_SPEED);
-tz1.setSpeed(TZ2_PIN_SPEED);
-
-
 
 void setup() {
   pinMode(TZ1_PIN_STOP, INPUT_PULLUP);
@@ -89,30 +85,32 @@ void setup() {
 
   Serial.begin(baud);
   Serial.println("Receiver setup");
-  mySwitch.enableReceive(RECEIVER_PIN);
+  receiver.enableReceive(RECEIVER_PIN);
+
+  tz0.setSpeed(TZ1_PIN_SPEED);
+  tz1.setSpeed(TZ2_PIN_SPEED);
   // pinMode(TEST_PIN, INPUT);
 }
 
 
 void loop() { 
-  if (mySwitch.available()) {  // Wenn ein Code Empfangen wird...
-    unsigned long code = mySwitch.getReceivedValue();
-    long decoded = decode(code, PREFIX_MASK);  
+  if (receiver.available()) {  // Wenn ein Code Empfangen wird...
+    unsigned long data = receiver.getReceivedValue();
 
     // bool legit = checkPrefix(code, decoded);
-    if (islegit(code, decoded, PREFIX)) {
+    if (islegit(data, CONTROL_RC_PREFIX, CONTROL_RC_PREFIX_LEN, CONTROL_RC_PREFIX_POS)) {
       // if (code == 1) {
       //   digitalWrite(pin1, HIGH);
       // }
       //Steuerung Tauchzellen
-      schalter1 = CHECK_BIT(code, 0);
-      schalter2 = CHECK_BIT(code, 1);
+      schalter1 = CHECK_BIT(data, 0);
+      schalter2 = CHECK_BIT(data, 1);
       // schalter3 = CHECK_BIT(code, 2);
 
       //Steuerung Seitentrieb
-      long jcd_raw = bitrange(code, 8, 3);
-      j0.parse(bitrange(jcd_raw, 4, 0));
-      j1.parse(bitrange(jcd_raw, 4, 4));
+      long jcd_raw = BIT_RANGE(data, 8, 3);
+      j0.parse(BIT_RANGE(jcd_raw, 4, 0));
+      j1.parse(BIT_RANGE(jcd_raw, 4, 4));
 
       Serial.print("Receiving: ");
       Serial.print("S1:");
@@ -122,9 +120,9 @@ void loop() {
     }
     else {
       Serial.print("Noise: ");
-      Serial.println(code);
+      Serial.println(data);
     }
-    mySwitch.resetAvailable();
+    receiver.resetAvailable();
   }
 
   // schalter1 = digitalRead(TEST_PIN);

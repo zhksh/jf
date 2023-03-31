@@ -1,0 +1,33 @@
+#define BAUD 9600
+#define MSG_LENGTH 32
+
+#define TEMP0_POS  0
+#define TEMP1_POS  8
+#define TEMP_LEN  8
+
+#define TURB_POS 16
+#define TURB_LEN 16
+
+#define SENSOR_RC_PREFIX 0xd
+#define SENSOR_RC_PREFIX_LEN 4
+#define SENSOR_RC_PREFIX_POS sizeof(long) - SENSOR_RC_PREFIX_LEN
+
+
+#define CONTROL_RC_PREFIX 0xa
+#define CONTROL_RC_PREFIX_LEN 4
+#define CONTROL_RC_PREFIX_POS sizeof(long) - CONTROL_RC_PREFIX_LEN
+#define CONTROL_S1_POS 0
+#define CONTROL_S2_POS 1
+#define CONTROL_S3_POS 2
+#define CONTROL_J_POS 3
+
+
+
+
+#define SENSOR_SEND_FRQ 200 //ms
+#define SENSOR_REPAT_TRANSMISSION 8 //ms
+
+
+
+
+

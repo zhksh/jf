@@ -4,20 +4,11 @@
 #include <stdbool.h>
 #include <RCSwitch.h>
 #include <debug.h>
+#include <util.h>
+#include <vals.h>
 
 
 #define RECEIVER_PIN 0     //interrupt 0 == pin 2
-
-#define PREFIX 0xd0000000  //codeword prefix 
-#define PREFIX_MASK 0x0fffffff
-
-#define TB_MASK    0x0fff0000
-#define TB_POS     16
-
-#define TEMP0_MASK 0x000000ff
-
-#define TEMP1_MASK 0x0000ff00
-#define TEMP1_POS  8
 
 #define BAUD  9600
 
@@ -31,20 +22,6 @@ void setup() {
   receiver.enableReceive(RECEIVER_PIN);
 }
 
-long decode(long msg) {
-  return msg & PREFIX_MASK;
-}
-
-bool checkPrefix(unsigned long original_msg, long  decoded) {
-  bool passed = (decoded | PREFIX) == original_msg;
-  // Serial.print("msg");
-  // Serial.print(original_msg);
-  return passed;
-}
-
-void debug(RCSwitch reciever){
-  output(receiver.getReceivedValue(), receiver.getReceivedBitlength(), receiver.getReceivedDelay(), receiver.getReceivedRawdata(),receiver.getReceivedProtocol());
-}
 
 void encodeForUI(float tb, float temp0, float temp1, float aux){
   Serial.print("DATA|");
@@ -93,17 +70,14 @@ float convertTransToTemp(long transmitted){
 
 void loop() {
   if (receiver.available()) {
-    // debug(mySwitch);
-    unsigned long msg = receiver.getReceivedValue();
-    long decoded = decode(msg);  
+    unsigned long data = receiver.getReceivedValue();
 
-    bool legit = checkPrefix(msg, decoded);
-    bool legit = true;
 
-    if (legit) {
-      long tb_val =  (msg & TB_MASK) >> TB_POS;
-      long temp1_val = (msg & TEMP1_MASK) >> TEMP1_POS;
-      long temp0_val = msg & TEMP0_MASK;
+    if (islegit(data, SENSOR_RC_PREFIX, SENSOR_RC_PREFIX_LEN, SENSOR_RC_PREFIX_POS)) {
+      long tb_val =  BIT_RANGE(data, TURB_LEN, TURB_POS);
+      long temp0_val = BIT_RANGE(data, TEMP_LEN, TEMP0_POS);
+      long temp1_val = BIT_RANGE(data, TEMP_LEN, TEMP1_POS);
+
 
       float temp0 = convertTransToTemp(temp0_val);
       float temp1 = convertTransToTemp(temp1_val);

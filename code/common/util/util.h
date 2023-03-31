@@ -10,6 +10,16 @@ long bitrange(long msg, int len, int pos){
   return result & mask;
 }
 
+long islegit(long data, long prefix, int prefix_pos, int prefix_len) {
+  return BIT_RANGE(data, prefix_len, prefix_pos) == prefix;
+}
+
+unsigned long addprefix(long data, int prefix, int prefix_pos) {
+  unsigned long p = prefix << prefix_pos;
+
+  return  data | p;
+}
+
 struct XAxis {
   bool right;
   bool left;
@@ -54,13 +64,6 @@ class Joystick {
 };
 
 
-long decode(long msg, long prefix_mask) {
-  return msg & prefix_mask;
-}
-
-bool islegit(unsigned long original_msg, unsigned long  decoded, long prefix) {
-  return (decoded | prefix) == original_msg;
-}
 
 class TZ {
     public: 
