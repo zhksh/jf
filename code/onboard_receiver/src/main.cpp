@@ -104,9 +104,7 @@ void loop() {
 
     // bool legit = checkPrefix(code, decoded);
     if (islegit(code, decoded, PREFIX)) {
-      // if (code == 1) {
-      //   digitalWrite(pin1, HIGH);
-      // }
+      
       //Steuerung Tauchzellen
       schalter1 = CHECK_BIT(code, 0);
       schalter2 = CHECK_BIT(code, 1);

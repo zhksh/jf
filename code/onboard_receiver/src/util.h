@@ -133,46 +133,44 @@ class TZ {
       if (digitalRead(stopPin) == 0){
         ausgefahren = true;
         stopTZ();
+        return;
       }
-      else {
-        if (controlSig) {  
-          if (!ausgefahren){
-            if ((counter > 0) && (millis() - counter) >= ausz){
-              stopTZ();
-              ausgefahren = true;
-            }
-            else {
-              //tauchzelle fährt nicht gerade aus
-              if (!fein){
-                if (!faus){
-                  //start timer ausfahrt
-                  counter = millis();
-                }
-                turnL();      
-              }       
-            }         
-          }     
-        }
-        //schalter aus
-        else {
-          //nur wenn ganz ausgefahren, wieder einfahren
-          if (ausgefahren){
+      
+      if (controlSig) {  
+        if (!ausgefahren){
+          if ((counter > 0) && (millis() - counter) >= ausz){
+            stopTZ();
+            ausgefahren = true;
+          }
+          else {
+            //tauchzelle fährt nicht gerade aus
             if (!fein){
-              //start timer einfahrt
-              counter = millis();
-            }
-            if ((counter > 0) && (millis() - counter) > einz){
-              //genug eingefahren, stop
-              log("eingefahren");
-              stopTZ();
-              ausgefahren = false;
-            }
-            else {
-              //einfahren
-              turnR();
+              //start timer ausfahrt
+              if (!faus) counter = millis();
+              turnL();      
             }       
-          }      
-        }
+          }         
+        }     
+      }
+      //schalter aus
+      else {
+        //nur wenn ganz ausgefahren, wieder einfahren
+        if (ausgefahren){
+           //start timer einfahrt
+          if (!fein) counter = millis();
+          
+          if ((counter > 0) && (millis() - counter) > einz){
+            //genug eingefahren, stop
+            log("eingefahren");
+            stopTZ();
+            ausgefahren = false;
+          }
+          else {
+            //einfahren
+            turnR();
+          }       
+        }      
+        
       }
     }
 };
