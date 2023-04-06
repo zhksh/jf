@@ -1,4 +1,0 @@
-#!/bin/bash
-
-stty  $1 raw 9600
-cat $1
